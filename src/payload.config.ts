@@ -9,9 +9,26 @@ import sharp from 'sharp'
 
 import { Users } from './collections/Users'
 import { Media } from './collections/Media'
+import { About } from './collections/About'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
+
+// Generate year options for dropdown
+function generateYearOptions() {
+  const currentYear = new Date().getFullYear();
+  const startYear = 2000; // Startjahr
+  const years = [];
+  
+  for (let year = currentYear; year >= startYear; year--) {
+    years.push({
+      label: year.toString(),
+      value: year.toString(),
+    });
+  }
+  
+  return years;
+}
 
 export default buildConfig({
   admin: {
@@ -20,7 +37,182 @@ export default buildConfig({
       baseDir: path.resolve(dirname),
     },
   },
-  collections: [Users, Media],
+  collections: [Users, Media, About,
+    {
+      slug: 'projects',
+      admin: {
+        useAsTitle: 'projectName',
+        components: {
+          // Hier könnten wir in Zukunft benutzerdefinierte Komponenten einbinden
+        },
+      },
+      hooks: {
+        beforeChange: [
+          ({ data }) => {
+            // Wenn kein Bild hochgeladen wurde, stellen wir sicher, dass das Feld nicht undefined ist
+            if (!data.projectImages || data.projectImages.length === 0) {
+              data.projectImages = [
+                {
+                  // Wir erstellen einen leeren Eintrag, der im Frontend erkannt wird
+                  image: null,
+                  useDefaultImage: true
+                }
+              ];
+            }
+            return data;
+          },
+        ],
+      },
+      fields: [
+        {
+          name: 'projectName',
+          type: 'text',
+          required: true,
+          unique: true,
+        },
+        {
+          name: 'projectImages',
+          type: 'array',
+          label: 'Bilder',
+          minRows: 0,
+          maxRows: 10,
+          labels: {
+            singular: 'Bild',
+            plural: 'Bilder',
+          },
+          fields: [
+            {
+              name: 'image',
+              type: 'upload',
+              relationTo: 'media',
+              required: false, 
+              admin: {
+                description: 'Wenn kein Bild hochgeladen wird, wird ein Platzhalterbild verwendet.'
+              }
+            },
+            {
+              name: 'useDefaultImage',
+              type: 'checkbox',
+              label: 'Standardbild verwenden',
+              defaultValue: false,
+              admin: {
+                description: 'Aktivieren Sie diese Option, um ein Standardbild zu verwenden, bis Sie ein eigenes Bild hochladen.'
+              }
+            }
+          ]
+        },
+        {
+          name: 'description',
+          type: 'textarea',
+          label: 'Ausführliche Beschreibung',
+          required: true,
+          admin: {
+            description: 'Ausführliche Beschreibung des Projekts (wird im Tooltip bei Shift+Hover angezeigt)',
+            rows: 6,
+          },
+        },
+        {
+          name: 'shortDescription',
+          type: 'textarea',
+          label: 'Kurzbeschreibung',
+          admin: {
+            description: 'Eine kurze Zusammenfassung des Projekts (max. 200 Zeichen)',
+          },
+          maxLength: 200,
+        },
+        {
+          name: 'tags',
+          type: 'select',
+          hasMany: true,
+          label: 'Tags',
+          options: [
+            {
+              label: 'Photo',
+              value: 'photo',
+            },
+            {
+              label: 'Video',
+              value: 'video',
+            },
+            {
+              label: '3D',
+              value: '3d',
+            },
+            {
+              label: 'Interactive',
+              value: 'interactive',
+            },
+            {
+              label: 'Rendering',
+              value: 'rendering',
+            },
+            {
+              label: 'Live',
+              value: 'live',
+            },
+            {
+              label: 'Projection',
+              value: 'projection',
+            }
+          ],
+          admin: {
+            description: 'Wählen Sie einen oder mehrere Tags zur Kategorisierung des Projekts',
+            isClearable: true,
+            isSortable: true,
+          }
+        },
+        {
+          name: 'creationYear',
+          type: 'select',
+          label: 'Erstellungsjahr',
+          required: true,
+          options: generateYearOptions(),
+        },
+        {
+          name: 'status',
+          type: 'radio',
+          label: 'Projektstatus',
+          required: true,
+          options: [
+            {
+              label: 'Laufend',
+              value: 'ongoing',
+            },
+            {
+              label: 'Abgeschlossen',
+              value: 'finished',
+            }
+          ],
+          defaultValue: 'finished',
+          admin: {
+            layout: 'horizontal',
+          }
+        },
+        {
+          name: 'contributors',
+          type: 'array',
+          label: 'Mitwirkende',
+          minRows: 0,
+          labels: {
+            singular: 'Mitwirkender',
+            plural: 'Mitwirkende',
+          },
+          fields: [
+            {
+              name: 'name',
+              type: 'text',
+              required: true,
+            },
+            {
+              name: 'role',
+              type: 'text',
+              label: 'Rolle',
+            }
+          ]
+        }
+      ]
+    }
+  ],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || '',
   typescript: {
