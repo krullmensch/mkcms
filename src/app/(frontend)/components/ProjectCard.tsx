@@ -1,30 +1,17 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import React from 'react';
+import { Project } from '@/payload-types';
 
 // Standard Platzhalterbild - kann durch ein eigenes Bild ersetzt werden
 const DEFAULT_IMAGE_URL = 'https://via.placeholder.com/800x600?text=Projekt+Vorschau';
 
 type ProjectCardProps = {
-  project: {
-    id: string;
-    projectName: string;
-    projectImages?: Array<{
-      image?: {
-        url: string;
-        alt?: string;
-      } | null;
-      useDefaultImage?: boolean;
-    }>;
-    creationYear?: string;
-    description?: any; // Rich Text Format
-    tags?: ('photo' | 'video' | '3d' | 'interactive' | 'rendering' | 'live' | 'projection')[] | null;
-  };
+  project: Project;
   showScrollArrow?: boolean; // Optional: Zeigt den Scroll-Pfeil an
 };
 
-export const ProjectCard: React.FC<ProjectCardProps> = ({ project, showScrollArrow = false }) => {
-  // Bestimme das anzuzeigende Bild
+export const ProjectCard: React.FC<ProjectCardProps> = ({ project, showScrollArrow = false }) => {  // Bestimme das anzuzeigende Bild (mit Video-Thumbnail-Unterstützung)
   const getImageToDisplay = () => {
     // Wenn keine Bilder vorhanden sind oder explizit das Standardbild verwendet werden soll
     if (!project.projectImages?.length || project.projectImages[0]?.useDefaultImage) {
@@ -33,12 +20,69 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, showScrollArr
         alt: `${project.projectName} - Standardbild`
       };
     }
+
+    // Suche nach einem Media-Item (entweder Bild oder Video)
+    const mediaItem = project.projectImages.find(item => 
+      (item.image && typeof item.image === 'object' && item.image !== null && 'url' in item.image) ||
+      (item.video && typeof item.video === 'object' && item.video !== null && 'url' in item.video)
+    )
     
-    // Erstes verfügbares Bild verwenden
-    const firstImage = project.projectImages[0]?.image;
-    if (firstImage) {
+    if (!mediaItem) {
       return {
-        url: firstImage.url,
+        url: DEFAULT_IMAGE_URL,
+        alt: `${project.projectName} - Standardbild`
+      };
+    }
+
+    // Wenn es ein Video ist, prüfe auf videoThumbnail
+    if (mediaItem.mediaType === 'video' && mediaItem.videoThumbnail) {
+      if (typeof mediaItem.videoThumbnail === 'object' && mediaItem.videoThumbnail !== null && 'url' in mediaItem.videoThumbnail) {
+        return {
+          url: mediaItem.videoThumbnail.url || DEFAULT_IMAGE_URL,
+          alt: `${project.projectName} - Video Thumbnail`
+        };
+      }
+      if (typeof mediaItem.videoThumbnail === 'string') {
+        return {
+          url: mediaItem.videoThumbnail,
+          alt: `${project.projectName} - Video Thumbnail`
+        };
+      }
+    }
+
+    // Wenn es ein Video ist aber kein videoThumbnail vorhanden ist, verwende Placeholder
+    if (mediaItem.mediaType === 'video') {
+      return {
+        url: DEFAULT_IMAGE_URL,
+        alt: `${project.projectName} - Video (kein Thumbnail)`
+      };
+    }
+    
+    // Für Bilder
+    if (mediaItem.image && typeof mediaItem.image === 'object' && 'url' in mediaItem.image) {
+      const firstImage = mediaItem.image;
+      
+      // Prüfe, ob es sich um ein Video handelt und ein Thumbnail verfügbar ist (Legacy-Support)
+      if (firstImage.mimeType?.startsWith('video/') && firstImage.thumbnail) {
+        // Wenn thumbnail ein Objekt ist (Media-Referenz)
+        if (typeof firstImage.thumbnail === 'object' && firstImage.thumbnail !== null && 'url' in firstImage.thumbnail) {
+          return {
+            url: firstImage.thumbnail.url || DEFAULT_IMAGE_URL,
+            alt: firstImage.alt || `${project.projectName} - Video Thumbnail`
+          };
+        }
+        // Wenn thumbnail ein String ist (direkte URL)
+        if (typeof firstImage.thumbnail === 'string') {
+          return {
+            url: firstImage.thumbnail,
+            alt: firstImage.alt || `${project.projectName} - Video Thumbnail`
+          };
+        }
+      }
+      
+      // Fallback auf das eigentliche Media-File (für Bilder oder Videos ohne Thumbnail)
+      return {
+        url: firstImage.url || DEFAULT_IMAGE_URL,
         alt: firstImage.alt || `${project.projectName}`
       };
     }
@@ -82,8 +126,8 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, showScrollArr
           <div className="project-description">
             {/* Hier könnte eine Kurzfassung der Beschreibung angezeigt werden */}
             <p>
-              {typeof project.description === 'string' 
-                ? project.description.substring(0, 100) + '...' 
+              {typeof project.description === 'object' && project.description.root 
+                ? 'Beschreibung verfügbar'
                 : 'Beschreibung verfügbar'}
             </p>
           </div>

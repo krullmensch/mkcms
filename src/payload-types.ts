@@ -141,6 +141,10 @@ export interface User {
 export interface Media {
   id: string;
   alt: string;
+  /**
+   * Optional: Thumbnail-Bild für Videos. Wird automatisch in der Suche und Vorschau angezeigt.
+   */
+  thumbnail?: (string | null) | Media;
   updatedAt: string;
   createdAt: string;
   url?: string | null;
@@ -191,9 +195,21 @@ export interface Project {
   projectImages?:
     | {
         /**
-         * Wenn kein Bild hochgeladen wird, wird ein Platzhalterbild verwendet.
+         * Wählen Sie aus, ob Sie ein Foto oder Video hochladen möchten.
+         */
+        mediaType: 'image' | 'video';
+        /**
+         * Laden Sie Ihr Foto hoch.
          */
         image?: (string | null) | Media;
+        /**
+         * Laden Sie Ihr Video hoch.
+         */
+        video?: (string | null) | Media;
+        /**
+         * Laden Sie ein Thumbnail-Bild für Ihr Video hoch (empfohlen für bessere Darstellung in Suchergebnissen).
+         */
+        videoThumbnail?: (string | null) | Media;
         /**
          * Aktivieren Sie diese Option, um ein Standardbild zu verwenden, bis Sie ein eigenes Bild hochladen.
          */
@@ -204,7 +220,21 @@ export interface Project {
   /**
    * Ausführliche Beschreibung des Projekts (wird im Tooltip bei Shift+Hover angezeigt)
    */
-  description: string;
+  description: {
+    root: {
+      type: string;
+      children: {
+        type: string;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
   /**
    * Eine kurze Zusammenfassung des Projekts (max. 200 Zeichen)
    */
@@ -337,6 +367,7 @@ export interface UsersSelect<T extends boolean = true> {
  */
 export interface MediaSelect<T extends boolean = true> {
   alt?: T;
+  thumbnail?: T;
   updatedAt?: T;
   createdAt?: T;
   url?: T;
@@ -380,7 +411,10 @@ export interface ProjectsSelect<T extends boolean = true> {
   projectImages?:
     | T
     | {
+        mediaType?: T;
         image?: T;
+        video?: T;
+        videoThumbnail?: T;
         useDefaultImage?: T;
         id?: T;
       };

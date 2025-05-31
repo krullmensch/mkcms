@@ -73,21 +73,77 @@ export default buildConfig({
         {
           name: 'projectImages',
           type: 'array',
-          label: 'Bilder',
+          label: 'Medien',
           minRows: 0,
           maxRows: 10,
           labels: {
-            singular: 'Bild',
-            plural: 'Bilder',
+            singular: 'Medium',
+            plural: 'Medien',
           },
           fields: [
+            {
+              name: 'mediaType',
+              type: 'select',
+              label: 'Medientyp',
+              required: true,
+              defaultValue: 'image',
+              options: [
+                {
+                  label: 'Foto',
+                  value: 'image',
+                },
+                {
+                  label: 'Video',
+                  value: 'video',
+                }
+              ],
+              admin: {
+                description: 'Wählen Sie aus, ob Sie ein Foto oder Video hochladen möchten.'
+              }
+            },
             {
               name: 'image',
               type: 'upload',
               relationTo: 'media',
-              required: false, 
+              required: false,
               admin: {
-                description: 'Wenn kein Bild hochgeladen wird, wird ein Platzhalterbild verwendet.'
+                description: 'Laden Sie Ihr Foto hoch.',
+                condition: (data, siblingData) => {
+                  return siblingData?.mediaType === 'image';
+                }
+              },
+              filterOptions: {
+                mimeType: { contains: 'image' }
+              }
+            },
+            {
+              name: 'video',
+              type: 'upload',
+              relationTo: 'media',
+              required: false,
+              admin: {
+                description: 'Laden Sie Ihr Video hoch.',
+                condition: (data, siblingData) => {
+                  return siblingData?.mediaType === 'video';
+                }
+              },
+              filterOptions: {
+                mimeType: { contains: 'video' }
+              }
+            },
+            {
+              name: 'videoThumbnail',
+              type: 'upload',
+              relationTo: 'media',
+              required: false,
+              admin: {
+                description: 'Laden Sie ein Thumbnail-Bild für Ihr Video hoch (empfohlen für bessere Darstellung in Suchergebnissen).',
+                condition: (data, siblingData) => {
+                  return siblingData?.mediaType === 'video';
+                }
+              },
+              filterOptions: {
+                mimeType: { contains: 'image' }
               }
             },
             {
@@ -96,19 +152,21 @@ export default buildConfig({
               label: 'Standardbild verwenden',
               defaultValue: false,
               admin: {
-                description: 'Aktivieren Sie diese Option, um ein Standardbild zu verwenden, bis Sie ein eigenes Bild hochladen.'
+                description: 'Aktivieren Sie diese Option, um ein Standardbild zu verwenden, bis Sie ein eigenes Bild hochladen.',
+                condition: (data, siblingData) => {
+                  return siblingData?.mediaType === 'image';
+                }
               }
             }
           ]
         },
         {
           name: 'description',
-          type: 'textarea',
+          type: 'richText',
           label: 'Ausführliche Beschreibung',
           required: true,
           admin: {
             description: 'Ausführliche Beschreibung des Projekts (wird im Tooltip bei Shift+Hover angezeigt)',
-            rows: 6,
           },
         },
         {

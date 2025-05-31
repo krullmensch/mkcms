@@ -78,7 +78,7 @@ const ProjectSection: React.FC<ProjectSectionProps> = ({ project, index, totalPr
   // Verarbeiten der Projektbilder
   const getProjectMedia = (): MediaItem[] => {
     if (!project.projectImages || project.projectImages.length === 0 || 
-        project.projectImages.every((item) => !item.image && !item.useDefaultImage)) {
+        project.projectImages.every((item) => !item.image && !item.video && !item.useDefaultImage)) {
       // Fallback auf Standardbild, wenn keine Bilder vorhanden sind
       return [{ 
         url: DEFAULT_IMAGE_URL,
@@ -87,9 +87,9 @@ const ProjectSection: React.FC<ProjectSectionProps> = ({ project, index, totalPr
       }]
     }
 
-    // Vorhandene Bilder verarbeiten
+    // Vorhandene Medien verarbeiten
     return project.projectImages
-      .filter((item) => item.image || item.useDefaultImage)
+      .filter((item) => item.image || item.video || item.useDefaultImage)
       .map((item): MediaItem | null => {
         if (item.useDefaultImage) {
           return {
@@ -99,11 +99,26 @@ const ProjectSection: React.FC<ProjectSectionProps> = ({ project, index, totalPr
           }
         }
         
+        // Video-Element verarbeiten
+        if (item.mediaType === 'video' && item.video && typeof item.video === 'object' && 'url' in item.video) {
+          const url = item.video.url
+          if (!url) return null
+          
+          return {
+            url,
+            alt: item.video.alt || `${project.projectName} - Video`,
+            type: 'video'
+          }
+        }
+        
+        // Bild-Element verarbeiten (oder Legacy-Support)
         if (item.image && typeof item.image === 'object' && 'url' in item.image) {
           const url = item.image.url
           if (!url) return null
           
-          const isVideo = url.endsWith('.mp4') || url.endsWith('.webm') || url.endsWith('.mov')
+          // Legacy: Prüfe ob das "Bild" eigentlich ein Video ist
+          const isVideo = url.endsWith('.mp4') || url.endsWith('.webm') || url.endsWith('.mov') || 
+                         item.image.mimeType?.startsWith('video/')
           
           return {
             url,

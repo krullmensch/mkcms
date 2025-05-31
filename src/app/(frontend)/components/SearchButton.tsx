@@ -44,7 +44,6 @@ const SearchButton: React.FC<SearchButtonProps> = ({ projects }) => {
     if (searchTerm.trim() !== '') {
       filtered = filtered.filter(project => 
         project.projectName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        project.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         project.shortDescription?.toLowerCase().includes(searchTerm.toLowerCase())
       )
     }
@@ -104,7 +103,7 @@ const SearchButton: React.FC<SearchButtonProps> = ({ projects }) => {
     }
   }
 
-  // Hilfsfunktion um das erste Projektbild zu holen
+  // Hilfsfunktion um das erste Projektbild zu holen oder Video-Thumbnail zu verwenden
   const getProjectThumbnail = (project: Project): string => {
     const DEFAULT_IMAGE = 'https://via.placeholder.com/300x200?text=Projekt+Vorschau'
     
@@ -112,12 +111,49 @@ const SearchButton: React.FC<SearchButtonProps> = ({ projects }) => {
       return DEFAULT_IMAGE
     }
 
-    const firstImage = project.projectImages.find(item => 
-      item.image && typeof item.image === 'object' && item.image !== null && 'url' in item.image
+    // Suche nach einem Media-Item (entweder Bild oder Video)
+    const mediaItem = project.projectImages.find(item => 
+      (item.image && typeof item.image === 'object' && item.image !== null && 'url' in item.image) ||
+      (item.video && typeof item.video === 'object' && item.video !== null && 'url' in item.video)
     )
     
-    if (firstImage?.image && typeof firstImage.image === 'object' && 'url' in firstImage.image) {
-      return firstImage.image.url || DEFAULT_IMAGE
+    if (!mediaItem) {
+      return DEFAULT_IMAGE
+    }
+
+    // Wenn es ein Video ist, prüfe auf videoThumbnail
+    if (mediaItem.mediaType === 'video' && mediaItem.videoThumbnail) {
+      if (typeof mediaItem.videoThumbnail === 'object' && mediaItem.videoThumbnail !== null && 'url' in mediaItem.videoThumbnail) {
+        return mediaItem.videoThumbnail.url || DEFAULT_IMAGE
+      }
+      if (typeof mediaItem.videoThumbnail === 'string') {
+        return mediaItem.videoThumbnail
+      }
+    }
+
+    // Wenn es ein Video ist aber kein videoThumbnail vorhanden ist, verwende das Video selbst
+    if (mediaItem.mediaType === 'video' && mediaItem.video && typeof mediaItem.video === 'object' && 'url' in mediaItem.video) {
+      return mediaItem.video.url || DEFAULT_IMAGE
+    }
+    
+    // Für Bilder oder als Fallback
+    if (mediaItem.image && typeof mediaItem.image === 'object' && 'url' in mediaItem.image) {
+      const media = mediaItem.image
+      
+      // Prüfe, ob es sich um ein Video handelt und ein Thumbnail verfügbar ist (Legacy-Support)
+      if (media.mimeType?.startsWith('video/') && media.thumbnail) {
+        // Wenn thumbnail ein Objekt ist (Media-Referenz)
+        if (typeof media.thumbnail === 'object' && media.thumbnail !== null && 'url' in media.thumbnail) {
+          return media.thumbnail.url || DEFAULT_IMAGE
+        }
+        // Wenn thumbnail ein String ist (direkte URL)
+        if (typeof media.thumbnail === 'string') {
+          return media.thumbnail
+        }
+      }
+      
+      // Fallback auf das eigentliche Media-File (für Bilder oder Videos ohne Thumbnail)
+      return media.url || DEFAULT_IMAGE
     }
     
     return DEFAULT_IMAGE
@@ -298,7 +334,7 @@ const SearchButton: React.FC<SearchButtonProps> = ({ projects }) => {
                 ) : (
                   <div className="search-no-results">
                     {searchTerm.trim() !== '' ? (
-                      <>Keine Projekte gefunden für "{searchTerm}"</>
+                      <>Keine Projekte gefunden für &quot;{searchTerm}&quot;</>
                     ) : (
                       <>Keine Projekte mit den ausgewählten Tags gefunden</>
                     )}
