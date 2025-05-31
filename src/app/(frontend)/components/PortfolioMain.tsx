@@ -6,21 +6,22 @@ import PortfolioHeader from './PortfolioHeader'
 import NameIntro from './NameIntro'
 import ProjectSection from './ProjectSection'
 import CustomCursor from './CustomCursor'
+import SearchButton from './SearchButton'
 
 interface PortfolioMainProps {
   projects: Project[]
 }
 
 const PortfolioMain: React.FC<PortfolioMainProps> = ({ projects }) => {
-  const [showIntro, setShowIntro] = useState(true)
+  const [showIntro, setShowIntro] = useState(false)
   
-  // Prüfe ob die Intro bereits gezeigt wurde (nur beim ersten Laden der Seite)
-  useEffect(() => {
-    const hasSeenIntro = sessionStorage.getItem('hasSeenIntro')
-    if (hasSeenIntro) {
-      setShowIntro(false)
-    }
-  }, [])
+  // Titel-Animation ist deaktiviert - showIntro bleibt immer false
+  // useEffect(() => {
+  //   const hasSeenIntro = sessionStorage.getItem('hasSeenIntro')
+  //   if (hasSeenIntro) {
+  //     setShowIntro(false)
+  //   }
+  // }, [])
 
   const handleAnimationComplete = () => {
     setShowIntro(false)
@@ -36,7 +37,8 @@ const PortfolioMain: React.FC<PortfolioMainProps> = ({ projects }) => {
       
       <PortfolioHeader isVisible={!showIntro} />
       
-
+      {/* Search Button - nur anzeigen wenn Intro vorbei ist */}
+      {!showIntro && <SearchButton projects={projects} />}
 
       {totalProjects > 0 ? (
         <>

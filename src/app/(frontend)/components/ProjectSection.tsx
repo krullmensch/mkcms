@@ -131,7 +131,7 @@ const ProjectSection: React.FC<ProjectSectionProps> = ({ project, index, totalPr
         const sectionId = entry.target.id
         
         // Prüfen, ob es sich um diesen Abschnitt handelt
-        if (sectionId === `project-${index}`) {
+        if (sectionId === `project-${project.id}`) {
           // Alle Videos in diesem Abschnitt abspielen/pausieren
           videoRefs.current.forEach(videoEl => {
             if (videoEl) {
@@ -147,7 +147,7 @@ const ProjectSection: React.FC<ProjectSectionProps> = ({ project, index, totalPr
     }, options)
 
     // Beobachte diesen Projektabschnitt
-    const section = document.getElementById(`project-${index}`)
+    const section = document.getElementById(`project-${project.id}`)
     if (section) {
       observer.observe(section)
     }
@@ -157,7 +157,7 @@ const ProjectSection: React.FC<ProjectSectionProps> = ({ project, index, totalPr
         observer.unobserve(section)
       }
     }
-  }, [index])
+  }, [project.id])
 
   const scrollToNextProject = () => {
     window.scrollTo({
@@ -173,7 +173,7 @@ const ProjectSection: React.FC<ProjectSectionProps> = ({ project, index, totalPr
   videoRefs.current = []
 
   return (
-    <section className="project-section" id={`project-${index}`}>
+    <section className="project-section" id={`project-${project.id}`}>
       <div className="media-container">
         {mediaItems.map((media, i) => (
           media.type === 'video' ? (
