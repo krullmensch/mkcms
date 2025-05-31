@@ -1,5 +1,6 @@
 import React from 'react'
 import './styles.css'
+import { ThemeProvider } from './context/ThemeContext'
 
 export const metadata = {
   description: 'Portfolio von Marvin Krullmann - Kreative Projekte und Arbeiten',
@@ -12,7 +13,9 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
   return (
     <html lang="de">
       <body>
-        <main>{children}</main>
+        <ThemeProvider>
+          <main>{children}</main>
+        </ThemeProvider>
       </body>
     </html>
   )

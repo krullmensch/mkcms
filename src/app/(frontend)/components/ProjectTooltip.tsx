@@ -79,19 +79,18 @@ const ProjectTooltip: React.FC<ProjectTooltipProps> = ({
       
       const tooltipHeight = baseHeight + contentHeight + tagsHeight + yearHeight + 40 // +40px für Padding
       
-      // Positioniere das Tooltip deutlich oberhalb des Cursors
-      const verticalOffset = 15 // Zusätzlicher Abstand nach oben
+      // Verankere das Tooltip am unteren Rand (nahe dem Cursor)
+      const verticalOffset = 15 // Abstand zum Cursor
       let x = mousePosition.x // Cursor X-Position als linke Kante des Tooltips
-      let y = mousePosition.y - tooltipHeight - verticalOffset // Tooltip deutlich oberhalb des Cursors
+      
+      // Fixe Y-Position: Tooltip soll immer am selben unteren Punkt verankert bleiben
+      // So erweitert es sich nur nach oben, wenn sich die Größe ändert
+      const anchorY = mousePosition.y - verticalOffset // Feste untere Verankerung
+      let y = anchorY - tooltipHeight // Tooltip oberhalb der Verankerung
       
       // Stelle sicher, dass das Tooltip nicht über die rechte Kante hinausgeht
       if (x + tooltipWidth > window.innerWidth - 20) {
         x = window.innerWidth - tooltipWidth - 20 // 20px Abstand zum Rand
-      }
-      
-      // Stelle sicher, dass das Tooltip nicht über die obere Kante hinausgeht
-      if (y < 20) {
-        y = 20 // Mindestabstand zum oberen Rand
       }
       
       // Stelle sicher, dass das Tooltip nicht über die linke Kante hinausgeht
@@ -99,12 +98,16 @@ const ProjectTooltip: React.FC<ProjectTooltipProps> = ({
         x = 20 // Mindestabstand zum linken Rand
       }
       
-      // Falls das Tooltip zu hoch wäre, positioniere es unterhalb des Cursors
-      if (y + tooltipHeight > window.innerHeight - 20) {
-        y = mousePosition.y + verticalOffset // Mit dem gleichen Abstand unterhalb des Cursors
-        // Überprüfe erneut, ob es unten genug Platz gibt
+      // Falls das Tooltip zu hoch für den verfügbaren Platz oberhalb ist,
+      // positioniere es unterhalb des Cursors (als Fallback)
+      if (y < 20) {
+        // Nicht genug Platz oberhalb - zeige unterhalb des Cursors
+        y = mousePosition.y + verticalOffset
+        
+        // Überprüfe, ob es unten genug Platz gibt
         if (y + tooltipHeight > window.innerHeight - 20) {
-          y = window.innerHeight - tooltipHeight - 20
+          // Auch unten nicht genug Platz - positioniere am oberen Rand
+          y = 20
         }
       }
       

@@ -1,10 +1,8 @@
 import { getPayload } from 'payload'
 import React from 'react'
-import Image from 'next/image'
 
 import config from '@/payload.config'
-import ProjectSection from './components/ProjectSection'
-import PortfolioHeader from './components/PortfolioHeader'
+import PortfolioMain from './components/PortfolioMain'
 
 export default async function HomePage() {
   const payloadConfig = await config
@@ -17,28 +15,5 @@ export default async function HomePage() {
     depth: 2, // Um Media-Referenzen aufzulösen
   })
 
-  const totalProjects = projects.length
-
-  return (
-    <div className="portfolio-container">
-      <PortfolioHeader />
-      
-      {totalProjects > 0 ? (
-        <>
-          {projects.map((project, index) => (
-            <ProjectSection 
-              key={project.id} 
-              project={project} 
-              index={index}
-              totalProjects={totalProjects}
-            />
-          ))}
-        </>
-      ) : (
-        <div className="no-projects">
-          <p>Noch keine Projekte vorhanden.</p>
-        </div>
-      )}
-    </div>
-  )
+  return <PortfolioMain projects={projects} />
 }

@@ -1,28 +1,27 @@
 "use client"
 
 import Link from 'next/link'
-import React, { useState } from 'react'
+import React from 'react'
+import ThemeToggle from './ThemeToggle'
 
-const PortfolioHeader: React.FC = () => {
-  const [isHovered, setIsHovered] = useState(false);
+interface PortfolioHeaderProps {
+  isVisible?: boolean
+}
+
+const PortfolioHeader: React.FC<PortfolioHeaderProps> = ({ isVisible = true }) => {
+  if (!isVisible) return null
 
   return (
-    <header className="portfolio-header">
-      <div 
-        className="header-container"
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
-      >
+    <>
+      <header className="portfolio-header">
         <h1>
           <Link href="/">MARVIN KRULLMANN</Link>
         </h1>
-        
-        {/* About Button with slide-in animation */}
-        <div className={`about-nav ${isHovered ? 'visible' : ''}`}>
-          <Link href="/about">About</Link>
-        </div>
-      </div>
-    </header>
+      </header>
+      
+      {/* Theme Toggle */}
+      <ThemeToggle />
+    </>
   )
 }
 

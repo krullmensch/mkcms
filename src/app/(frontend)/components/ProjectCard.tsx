@@ -129,8 +129,8 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, showScrollArr
         }
         
         .project-tag {
-          background-color: #e0e0e0;
-          color: #333;
+          background-color: var(--tooltip-tag-bg);
+          color: var(--text-color);
           padding: 0.2rem 0.5rem;
           border-radius: 15px;
           font-size: 0.75rem;

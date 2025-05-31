@@ -7,6 +7,25 @@
   --spacing-sm: 1rem;
   --spacing-md: 2rem;
   --spacing-lg: 4rem;
+  
+  /* Theme-spezifische Variablen - werden dynamisch durch JavaScript gesetzt */
+  --toggle-bg: rgba(255, 255, 255, 0.1);
+  --toggle-border: rgba(255, 255, 255, 0.2);
+  --toggle-hover-bg: rgba(255, 255, 255, 0.15);
+  --toggle-hover-border: rgba(255, 255, 255, 0.3);
+  --tooltip-bg: rgba(0, 0, 0, 0.95);
+  --tooltip-border: rgba(255, 255, 255, 0.1);
+  --tooltip-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  --tooltip-tag-bg: rgba(255, 255, 255, 0.1);
+  
+  /* Weitere Theme-Variablen - werden dynamisch durch JavaScript gesetzt */
+  --title-hover-color: rgba(255, 255, 255, 0.9);
+  --link-bg: rgba(255, 255, 255, 0.1);
+  --code-bg: rgba(255, 255, 255, 0.15);
+  
+  /* Cursor-Variablen */
+  --cursor-color: #ffffff;
+  --cursor-dot-color: #ffffff;
 }
 
 /* Verstecke das Next.js DevTools-Icon */
@@ -34,7 +53,7 @@
 html {
   font-size: 18px;
   line-height: 32px;
-  background: rgb(0, 0, 0);
+  background: var(--bg-color);
   -webkit-font-smoothing: antialiased;
   scroll-snap-type: y mandatory;
   height: 100%;
@@ -154,15 +173,15 @@ svg {
     }
 
     .admin {
-      color: rgb(0, 0, 0);
-      background: rgb(1000, 1000, 1000);
-      border: 1px solid rgb(0, 0, 0);
+      color: var(--bg-color);
+      background: var(--text-color);
+      border: 1px solid var(--bg-color);
     }
 
     .docs {
-      color: rgb(1000, 1000, 1000);
-      background: rgb(0, 0, 0);
-      border: 1px solid rgb(1000, 1000, 1000);
+      color: var(--text-color);
+      background: var(--bg-color);
+      border: 1px solid var(--text-color);
     }
   }
 
@@ -183,7 +202,7 @@ svg {
     .codeLink {
       text-decoration: none;
       padding: 0 0.5rem;
-      background: rgb(60, 60, 60);
+      background: var(--code-bg);
       border-radius: 4px;
     }
   }
@@ -198,7 +217,7 @@ main {
   position: fixed;
   top: var(--spacing-md);
   left: var(--spacing-md);
-  z-index: 100;
+  z-index: 200; /* Über der Welle */
 }
 
 .portfolio-header h1 {
@@ -210,61 +229,6 @@ main {
 .portfolio-header a {
   color: var(--text-color);
   text-decoration: none;
-}
-
-/* Header Container */
-.header-container {
-  display: flex;
-  align-items: center;
-  position: relative;
-  cursor: pointer;
-}
-
-/* About Navigation */
-.about-nav {
-  opacity: 0;
-  transform: translateX(-20px);
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  margin-left: 1.5rem;
-  position: relative;
-}
-
-.about-nav.visible {
-  opacity: 1;
-  transform: translateX(0);
-}
-
-.about-nav a {
-  color: var(--text-secondary);
-  font-size: 1rem;
-  font-weight: 300;
-  padding: 0.5rem 0.75rem;
-  border-radius: 4px;
-  transition: all 0.3s ease;
-  position: relative;
-  display: inline-block;
-}
-
-.about-nav a:hover {
-  color: var(--text-color);
-  background: rgba(255, 255, 255, 0.05);
-}
-
-/* Subtle underline animation */
-.about-nav a::after {
-  content: '';
-  position: absolute;
-  bottom: 0.25rem;
-  left: 0.75rem;
-  right: 0.75rem;
-  height: 1px;
-  background: var(--text-color);
-  transform: scaleX(0);
-  transition: transform 0.3s ease;
-}
-
-.about-nav a:hover::after {
-  transform: scaleX(1);
 }
 
 /* Project Section */
@@ -280,7 +244,7 @@ main {
   position: absolute;
   bottom: var(--spacing-md);
   left: var(--spacing-md);
-  z-index: 10;
+  z-index: 100; /* Über der Welle */
 }
 
 .project-title h2 {
@@ -293,7 +257,7 @@ main {
 }
 
 .project-title h2:hover {
-  color: rgba(255, 255, 255, 0.9);
+  color: var(--title-hover-color);
   transform: translateY(-1px);
 }
 
@@ -316,6 +280,7 @@ main {
   scroll-behavior: smooth;
   gap: var(--spacing-sm);
   padding: 0 var(--spacing-md);
+  z-index: 80; /* Über der Welle */
 }
 
 .media-item {
@@ -338,7 +303,7 @@ main {
   color: var(--text-color);
   opacity: 0.7;
   transition: opacity 0.3s ease, transform 0.3s ease;
-  z-index: 20;
+  z-index: 100; /* Über der Welle */
   animation: bounce 2s infinite;
 }
 
@@ -357,194 +322,6 @@ main {
   60% {
     transform: translateX(-50%) translateY(-5px);
   }
-}
-
-/* About Page Styles */
-.about-page {
-  min-height: 100vh;
-  background-color: var(--bg-color);
-  color: var(--text-color);
-}
-
-.about-content {
-  padding: calc(var(--spacing-lg) + 2rem) var(--spacing-md) var(--spacing-lg);
-  max-width: 1400px;
-  margin: 0 auto;
-}
-
-.about-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: var(--spacing-lg);
-  align-items: start;
-}
-
-@media (min-width: 1024px) {
-  .about-grid {
-    grid-template-columns: 400px 1fr;
-    gap: calc(var(--spacing-lg) * 1.5);
-  }
-}
-
-/* Profile Section */
-.profile-section {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-md);
-}
-
-.profile-image-container {
-  width: 100%;
-  max-width: 400px;
-  aspect-ratio: 1;
-  border-radius: 8px;
-  overflow: hidden;
-  position: relative;
-  margin: 0 auto;
-}
-
-@media (min-width: 1024px) {
-  .profile-image-container {
-    margin: 0;
-  }
-}
-
-.profile-image {
-  transition: transform 0.3s ease;
-}
-
-.profile-image:hover {
-  transform: scale(1.02);
-}
-
-.profile-placeholder {
-  width: 100%;
-  height: 100%;
-  background: #2a2a2a;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--text-secondary);
-  font-size: 1rem;
-}
-
-/* Contact Section */
-.contact-section {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-sm);
-}
-
-.contact-section h2 {
-  font-size: 1.5rem;
-  font-weight: 400;
-  margin: 0 0 var(--spacing-sm) 0;
-  color: var(--text-color);
-}
-
-.contact-links {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-}
-
-.contact-link {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  text-decoration: none;
-  color: var(--text-secondary);
-  transition: color 0.3s ease;
-  padding: 0.5rem 0;
-}
-
-.contact-link:hover {
-  color: var(--text-color);
-}
-
-.contact-link svg {
-  width: 20px;
-  height: 20px;
-  flex-shrink: 0;
-}
-
-/* Social Media Section */
-.social-section {
-  margin-top: var(--spacing-sm);
-}
-
-.social-section h3 {
-  font-size: 1.25rem;
-  font-weight: 400;
-  margin: 0 0 var(--spacing-sm) 0;
-  color: var(--text-color);
-}
-
-.social-links {
-  display: flex;
-  gap: 0.75rem;
-  flex-wrap: wrap;
-}
-
-.social-link {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 40px;
-  height: 40px;
-  text-decoration: none;
-  color: var(--text-secondary);
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 6px;
-  transition: all 0.3s ease;
-}
-
-.social-link:hover {
-  color: var(--text-color);
-  background: rgba(255, 255, 255, 0.1);
-  transform: translateY(-2px);
-}
-
-.social-link svg {
-  width: 20px;
-  height: 20px;
-}
-
-/* Biography Section */
-.biography-section {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-md);
-}
-
-.biography-section h1 {
-  margin: 0;
-  color: var(--text-color);
-}
-
-.biography-content {
-  line-height: 1.8;
-  color: var(--text-secondary);
-}
-
-.biography-content p {
-  margin: 0 0 1.5rem 0;
-}
-
-.biography-content strong {
-  color: var(--text-color);
-  font-weight: 600;
-}
-
-.biography-content a {
-  color: var(--text-color);
-  text-decoration: underline;
-  text-decoration-color: var(--text-secondary);
-  transition: text-decoration-color 0.3s ease;
-}
-
-.biography-content a:hover {
-  text-decoration-color: var(--text-color);
 }
 
 /* Project Tooltip Styles */
@@ -569,14 +346,14 @@ main {
 }
 
 .tooltip-content {
-  background: rgba(0, 0, 0, 0.95);
+  background: var(--tooltip-bg);
   backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--tooltip-border);
   border-radius: 8px;
   padding: 1rem;
   width: 100%;
   min-height: 80px; /* Mindesthöhe für Konsistenz */
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  box-shadow: var(--tooltip-shadow);
   color: var(--text-color);
   font-size: 0.875rem;
   line-height: 1.5;
@@ -609,7 +386,7 @@ main {
 }
 
 .tooltip-tag {
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--tooltip-tag-bg);
   color: var(--text-color);
   padding: 0.25rem 0.5rem;
   border-radius: 12px;
@@ -628,59 +405,184 @@ main {
 }
 
 .tooltip-hint {
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-top: 1px solid var(--tooltip-border);
   padding-top: 0.5rem;
   margin-top: auto; /* Drückt den Hint nach unten */
   font-size: 0.75rem;
-  color: rgba(255, 255, 255, 0.6);
+  color: var(--text-secondary);
   font-style: italic;
   min-height: 1rem; /* Konsistente Höhe */
+  opacity: 0.8;
 }
 
-/* Responsive Tooltip */
+/* Custom Cursor */
+.custom-cursor {
+  position: fixed;
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--cursor-color);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9999;
+  transform: translate(-50%, -50%);
+  opacity: 0;
+}
+
+.custom-cursor.visible {
+  opacity: 1;
+}
+
+.custom-cursor.hover {
+  /* Keine Größenänderung des Kreises, nur border-width reduzieren für visuellen Effekt */
+  border-width: 1px;
+}
+
+.custom-cursor .cursor-dot {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 80%;
+  height: 80%;
+  background: var(--cursor-dot-color);
+  border-radius: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  transition: transform 0.15s ease;
+}
+
+.custom-cursor.hover .cursor-dot {
+  transform: translate(-50%, -50%) scale(1);
+}
+
+/* Hide default cursor */
+body {
+  cursor: none;
+}
+
+/* Hide default cursor on all interactive elements */
+a, button, [role="button"], .theme-toggle, .project-title h2, .scroll-arrow, .portfolio-header a, [data-tooltip] {
+  cursor: none !important;
+}
+
+/* Show default cursor on specific elements that need it */
+input, textarea, [contenteditable] {
+  cursor: text !important;
+}
+
 @media (max-width: 768px) {
-  .tooltip-content {
-    max-width: 280px;
-    padding: 0.875rem;
-    font-size: 0.8125rem;
+  .custom-cursor {
+    display: none;
   }
   
-  .tooltip-tag {
-    font-size: 0.6875rem;
-    padding: 0.1875rem 0.375rem;
+  body {
+    cursor: auto;
   }
-}
-
-/* Hide tooltip on small screens where hover doesn't work well */
-@media (max-width: 480px) {
-  .project-tooltip {
-    display: none;
+  
+  input, textarea, [contenteditable] {
+    cursor: text !important;
   }
 }
 
 /* Responsive Design */
 @media (max-width: 1024px) {
-  .about-content {
-    padding: calc(var(--spacing-md) + 2rem) var(--spacing-sm) var(--spacing-md);
-  }
-  
-  .contact-section h2,
-  .social-section h3 {
-    font-size: 1.25rem;
-  }
+  /* Placeholder für zukünftige Responsive Styles */
 }
 
 @media (max-width: 768px) {
-  .about-content {
-    padding: calc(var(--spacing-sm) + 2rem) var(--spacing-sm) var(--spacing-sm);
+  /* Placeholder für zukünftige Responsive Styles */
+}
+
+/* Theme Toggle */
+.theme-toggle {
+  position: fixed;
+  top: var(--spacing-md);
+  right: var(--spacing-md);
+  z-index: 1000;
+  background: var(--toggle-bg);
+  border: 1px solid var(--toggle-border);
+  border-radius: 8px;
+  padding: 0.75rem;
+  cursor: pointer;
+  color: var(--text-color);
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.theme-toggle:hover {
+  background: var(--toggle-hover-bg);
+  border-color: var(--toggle-hover-border);
+  transform: scale(1.05);
+}
+
+.theme-toggle svg {
+  transition: transform 0.3s ease;
+}
+
+.theme-toggle:hover svg {
+  transform: rotate(15deg);
+}
+
+/* Theme Transition Wave Animation */
+.theme-wave-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 50; /* Niedriger als Bilder und UI-Elemente */
+  overflow: hidden;
+}
+
+.theme-wave {
+  position: absolute;
+  border-radius: 50%;
+  transform: scale(0);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.theme-wave.active {
+  animation: waveExpand 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+@keyframes waveExpand {
+  0% {
+    transform: scale(0);
+    opacity: 1;
   }
-  
-  .profile-image-container {
-    max-width: 300px;
+  100% {
+    transform: scale(6);
+    opacity: 1;
   }
-  
-  .contact-section h2,
-  .social-section h3 {
-    font-size: 1.125rem;
+}
+
+/* Theme transition for smooth color changes */
+:root {
+  transition: background-color 0.6s cubic-bezier(0.4, 0, 0.2, 1), 
+              color 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+body {
+  transition: background-color 0.6s cubic-bezier(0.4, 0, 0.2, 1), 
+              color 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Multiple wave effect - Echte Farbwellen */
+.theme-wave-light {
+  background: #ffffff; /* Vollständig weiß für Light Mode */
+}
+
+.theme-wave-dark {
+  background: #000000; /* Vollständig schwarz für Dark Mode */
+}
+
+@media (max-width: 768px) {
+  .theme-toggle {
+    top: var(--spacing-sm);
+    right: var(--spacing-sm);
+    padding: 0.5rem;
   }
 }
