@@ -5,7 +5,7 @@ export const MediaBulk: CollectionConfig = {
   admin: {
     useAsTitle: 'name',
     description: 'Mehrere Medien gleichzeitig hochladen',
-    group: 'Medien'
+    group: 'Medien',
   },
   access: {
     read: () => true,
@@ -16,15 +16,15 @@ export const MediaBulk: CollectionConfig = {
       type: 'text',
       required: true,
       admin: {
-        description: 'Name für diesen Batch-Upload (z.B. "Projekt XY Bilder")'
-      }
+        description: 'Name für diesen Batch-Upload (z.B. "Projekt XY Bilder")',
+      },
     },
     {
       name: 'description',
       type: 'textarea',
       admin: {
-        description: 'Optional: Beschreibung für diesen Upload-Batch'
-      }
+        description: 'Optional: Beschreibung für diesen Upload-Batch',
+      },
     },
     {
       name: 'files',
@@ -32,7 +32,7 @@ export const MediaBulk: CollectionConfig = {
       label: 'Dateien',
       minRows: 1,
       admin: {
-        description: 'Fügen Sie mehrere Bilder oder Videos hinzu'
+        description: 'Fügen Sie mehrere Bilder oder Videos hinzu',
       },
       fields: [
         {
@@ -41,32 +41,33 @@ export const MediaBulk: CollectionConfig = {
           relationTo: 'media',
           required: true,
           admin: {
-            description: 'Datei auswählen'
-          }
+            description: 'Datei auswählen',
+          },
         },
         {
           name: 'customAlt',
           type: 'text',
           admin: {
-            description: 'Optional: Spezifischer Alt-Text für diese Datei (überschreibt automatische Generierung)'
-          }
+            description:
+              'Optional: Spezifischer Alt-Text für diese Datei (überschreibt automatische Generierung)',
+          },
         },
         {
           name: 'tags',
           type: 'text',
           admin: {
-            description: 'Optional: Tags für bessere Organisation (komma-getrennt)'
-          }
-        }
-      ]
+            description: 'Optional: Tags für bessere Organisation (komma-getrennt)',
+          },
+        },
+      ],
     },
     {
       name: 'project',
       type: 'relationship',
       relationTo: 'projects',
       admin: {
-        description: 'Optional: Verknüpfe diese Medien mit einem Projekt'
-      }
+        description: 'Optional: Verknüpfe diese Medien mit einem Projekt',
+      },
     },
     {
       name: 'autoAddToProject',
@@ -74,9 +75,9 @@ export const MediaBulk: CollectionConfig = {
       defaultValue: false,
       admin: {
         description: 'Automatisch alle Dateien zum ausgewählten Projekt hinzufügen',
-        condition: (data) => !!data.project
-      }
-    }
+        condition: (data) => !!data.project,
+      },
+    },
   ],
   hooks: {
     afterChange: [
@@ -85,7 +86,7 @@ export const MediaBulk: CollectionConfig = {
         if (doc.autoAddToProject && doc.project && doc.files) {
           try {
             const projectId = typeof doc.project === 'object' ? doc.project.id : doc.project
-            
+
             // Hole das aktuelle Projekt
             const project = await req.payload.findByID({
               collection: 'projects',
@@ -96,29 +97,26 @@ export const MediaBulk: CollectionConfig = {
               // Erstelle neue Media-Items für das Projekt
               const newMediaItems = doc.files.map((fileItem: any) => ({
                 mediaType: 'image', // Default, könnte intelligenter sein
-                image: fileItem.file
+                image: fileItem.file,
               }))
 
               // Füge die neuen Items zu den bestehenden hinzu
-              const updatedProjectImages = [
-                ...(project.projectImages || []),
-                ...newMediaItems
-              ]
+              const updatedProjectImages = [...(project.projectImages || []), ...newMediaItems]
 
               // Update das Projekt
               await req.payload.update({
                 collection: 'projects',
                 id: projectId,
                 data: {
-                  projectImages: updatedProjectImages
-                }
+                  projectImages: updatedProjectImages,
+                },
               })
             }
           } catch (error) {
             console.error('Fehler beim automatischen Hinzufügen der Medien zum Projekt:', error)
           }
         }
-      }
-    ]
-  }
+      },
+    ],
+  },
 }

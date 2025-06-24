@@ -17,18 +17,23 @@ const getFileNameFromUrl = (url: string): string => {
     return fileName
       .replace(/\.[^/.]+$/, '') // Entferne Dateiendung
       .replace(/[_-]/g, ' ') // Ersetze _ und - durch Leerzeichen
-      .replace(/\b\w/g, l => l.toUpperCase()) // Kapitalisiere jeden Wortanfang
+      .replace(/\b\w/g, (l) => l.toUpperCase()) // Kapitalisiere jeden Wortanfang
   } catch {
     return 'Datei'
   }
 }
 
 // Hilfsfunktion: Generiert Alt-Text basierend auf vorhandenem Text oder Dateinamen
-const generateAltText = (existingAlt: string | undefined, url: string, projectName: string, mediaType: string = 'Bild'): string => {
+const generateAltText = (
+  existingAlt: string | undefined,
+  url: string,
+  projectName: string,
+  mediaType: string = 'Bild',
+): string => {
   if (existingAlt && existingAlt.trim()) {
     return existingAlt
   }
-  
+
   const fileName = getFileNameFromUrl(url)
   return `${projectName} - ${fileName}`
 }
@@ -151,8 +156,10 @@ const ProjectSection: React.FC<ProjectSectionProps> = ({ project, index, totalPr
         // YouTube-Video verarbeiten
         if (item.mediaType === 'youtube' && item.youtubeUrl) {
           // Für YouTube verwenden wir den Titel oder generieren einen aus der URL
-          const altText = item.youtubeTitle || generateAltText(undefined, item.youtubeUrl, project.projectName, 'YouTube Video')
-          
+          const altText =
+            item.youtubeTitle ||
+            generateAltText(undefined, item.youtubeUrl, project.projectName, 'YouTube Video')
+
           return {
             url: item.youtubeUrl,
             alt: altText,
@@ -197,7 +204,12 @@ const ProjectSection: React.FC<ProjectSectionProps> = ({ project, index, totalPr
 
           return {
             url,
-            alt: generateAltText(item.image.alt, url, project.projectName, isVideo ? 'Video' : 'Bild'),
+            alt: generateAltText(
+              item.image.alt,
+              url,
+              project.projectName,
+              isVideo ? 'Video' : 'Bild',
+            ),
             type: isVideo ? 'video' : 'image',
           }
         }

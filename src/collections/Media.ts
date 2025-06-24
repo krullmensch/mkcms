@@ -13,7 +13,7 @@ export const Media: CollectionConfig = {
     enableRichTextLink: false,
     components: {
       // Hier könnten wir später eine benutzerdefinierte Upload-Komponente hinzufügen
-    }
+    },
   },
   upload: {
     // Aktiviere Multi-File-Upload
@@ -51,9 +51,10 @@ export const Media: CollectionConfig = {
       type: 'text',
       required: false,
       admin: {
-        description: 'Optional: Alt-Text für Barrierefreiheit. Wenn leer, wird automatisch der Dateiname verwendet.',
-        placeholder: 'Wird automatisch aus dem Dateinamen generiert...'
-      }
+        description:
+          'Optional: Alt-Text für Barrierefreiheit. Wenn leer, wird automatisch der Dateiname verwendet.',
+        placeholder: 'Wird automatisch aus dem Dateinamen generiert...',
+      },
     },
     {
       name: 'thumbnail',
@@ -61,15 +62,16 @@ export const Media: CollectionConfig = {
       relationTo: 'media',
       label: 'Video-Thumbnail',
       admin: {
-        description: 'Optional: Thumbnail-Bild für Videos. Wird automatisch in der Suche und Vorschau angezeigt.',
+        description:
+          'Optional: Thumbnail-Bild für Videos. Wird automatisch in der Suche und Vorschau angezeigt.',
         condition: (data, siblingData) => {
           // Zeige das Feld nur an, wenn es sich um ein Video handelt
           if (data?.mimeType) {
             return data.mimeType.startsWith('video/')
           }
           return false
-        }
-      }
+        },
+      },
     },
   ],
 }
