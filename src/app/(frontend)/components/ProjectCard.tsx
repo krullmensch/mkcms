@@ -6,6 +6,30 @@ import { Project } from '@/payload-types';
 // Standard Platzhalterbild - kann durch ein eigenes Bild ersetzt werden
 const DEFAULT_IMAGE_URL = 'https://via.placeholder.com/800x600?text=Projekt+Vorschau';
 
+// Hilfsfunktion: Extrahiert Dateinamen aus URL für Alt-Text
+const getFileNameFromUrl = (url: string): string => {
+  try {
+    const fileName = url.split('/').pop()?.split('?')[0] || 'Datei'
+    // Entferne Dateiendung und ersetze Unterstriche/Bindestriche durch Leerzeichen
+    return fileName
+      .replace(/\.[^/.]+$/, '') // Entferne Dateiendung
+      .replace(/[_-]/g, ' ') // Ersetze _ und - durch Leerzeichen
+      .replace(/\b\w/g, l => l.toUpperCase()) // Kapitalisiere jeden Wortanfang
+  } catch {
+    return 'Datei'
+  }
+}
+
+// Hilfsfunktion: Generiert Alt-Text basierend auf vorhandenem Text oder Dateinamen
+const generateAltText = (existingAlt: string | undefined, url: string, projectName: string, mediaType: string = 'Bild'): string => {
+  if (existingAlt && existingAlt.trim()) {
+    return existingAlt
+  }
+  
+  const fileName = getFileNameFromUrl(url)
+  return `${projectName} - ${fileName}`
+}
+
 type ProjectCardProps = {
   project: Project;
   showScrollArrow?: boolean; // Optional: Zeigt den Scroll-Pfeil an
@@ -45,7 +69,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, showScrollArr
       if (typeof mediaItem.videoThumbnail === 'string') {
         return {
           url: mediaItem.videoThumbnail,
-          alt: `${project.projectName} - Video Thumbnail`
+          alt: generateAltText(undefined, mediaItem.videoThumbnail, project.projectName, 'Video Thumbnail')
         };
       }
     }
@@ -66,24 +90,26 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, showScrollArr
       if (firstImage.mimeType?.startsWith('video/') && firstImage.thumbnail) {
         // Wenn thumbnail ein Objekt ist (Media-Referenz)
         if (typeof firstImage.thumbnail === 'object' && firstImage.thumbnail !== null && 'url' in firstImage.thumbnail) {
+          const thumbnailUrl = firstImage.thumbnail.url || DEFAULT_IMAGE_URL;
           return {
-            url: firstImage.thumbnail.url || DEFAULT_IMAGE_URL,
-            alt: firstImage.alt || `${project.projectName} - Video Thumbnail`
+            url: thumbnailUrl,
+            alt: generateAltText(firstImage.alt, thumbnailUrl, project.projectName, 'Video Thumbnail')
           };
         }
         // Wenn thumbnail ein String ist (direkte URL)
         if (typeof firstImage.thumbnail === 'string') {
           return {
             url: firstImage.thumbnail,
-            alt: firstImage.alt || `${project.projectName} - Video Thumbnail`
+            alt: generateAltText(firstImage.alt, firstImage.thumbnail, project.projectName, 'Video Thumbnail')
           };
         }
       }
       
       // Fallback auf das eigentliche Media-File (für Bilder oder Videos ohne Thumbnail)
+      const imageUrl = firstImage.url || DEFAULT_IMAGE_URL;
       return {
-        url: firstImage.url || DEFAULT_IMAGE_URL,
-        alt: firstImage.alt || `${project.projectName}`
+        url: imageUrl,
+        alt: generateAltText(firstImage.alt, imageUrl, project.projectName)
       };
     }
     

@@ -5,11 +5,55 @@ export const Media: CollectionConfig = {
   access: {
     read: () => true,
   },
+  admin: {
+    useAsTitle: 'filename',
+    description: 'Medien-Bibliothek für Bilder und Videos',
+    group: 'Medien',
+    // Aktiviere Bulk-Upload
+    enableRichTextLink: false,
+    components: {
+      // Hier könnten wir später eine benutzerdefinierte Upload-Komponente hinzufügen
+    }
+  },
+  upload: {
+    // Aktiviere Multi-File-Upload
+    adminThumbnail: 'thumbnail',
+    mimeTypes: ['image/*', 'video/*'],
+    // Maximale Dateigröße (50MB)
+    resizeOptions: {
+      width: 1920,
+      height: 1080,
+      position: 'centre',
+      fit: 'inside',
+      withoutEnlargement: true,
+    },
+    // Thumbnail-Generierung
+    imageSizes: [
+      {
+        name: 'thumbnail',
+        width: 400,
+        height: 300,
+        position: 'centre',
+        fit: 'cover',
+      },
+      {
+        name: 'card',
+        width: 768,
+        height: 576,
+        position: 'centre',
+        fit: 'cover',
+      },
+    ],
+  },
   fields: [
     {
       name: 'alt',
       type: 'text',
-      required: true,
+      required: false,
+      admin: {
+        description: 'Optional: Alt-Text für Barrierefreiheit. Wenn leer, wird automatisch der Dateiname verwendet.',
+        placeholder: 'Wird automatisch aus dem Dateinamen generiert...'
+      }
     },
     {
       name: 'thumbnail',
@@ -28,5 +72,4 @@ export const Media: CollectionConfig = {
       }
     },
   ],
-  upload: true,
 }

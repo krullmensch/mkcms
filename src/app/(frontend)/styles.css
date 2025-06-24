@@ -279,6 +279,27 @@ main {
   gap: var(--spacing-sm);
   padding: 0 var(--spacing-md);
   z-index: 80; /* Über der Welle */
+  /* Drag Scroll Styles */
+  cursor: grab;
+  user-select: none;
+  /* Smooth Scrolling Performance */
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE und Edge */
+}
+
+/* Verstecke Scrollbar für alle Browser */
+.media-container::-webkit-scrollbar {
+  display: none;
+}
+
+.media-container.dragging {
+  cursor: grabbing;
+  scroll-behavior: auto; /* Deaktiviere smooth scrolling während des Draggings */
+}
+
+.media-container.dragging * {
+  pointer-events: none; /* Verhindere Klicks auf Inhalte während des Draggings */
 }
 
 .media-item {
@@ -887,11 +908,6 @@ body {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.2s ease;
-}
-
-.search-result-card:hover .search-result-thumbnail img {
-  transform: scale(1.05);
 }
 
 .search-result-content {

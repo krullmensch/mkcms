@@ -4,9 +4,34 @@ import Image from 'next/image'
 import React, { useEffect, useRef, useState } from 'react'
 import ProjectTooltip from './ProjectTooltip'
 import { Project } from '@/payload-types'
+import { useDragScroll } from '../hooks/useDragScroll'
 
 // Standard Platzhalterbild
 const DEFAULT_IMAGE_URL = 'https://via.placeholder.com/1200x800?text=Projekt+Vorschau'
+
+// Hilfsfunktion: Extrahiert Dateinamen aus URL für Alt-Text
+const getFileNameFromUrl = (url: string): string => {
+  try {
+    const fileName = url.split('/').pop()?.split('?')[0] || 'Datei'
+    // Entferne Dateiendung und ersetze Unterstriche/Bindestriche durch Leerzeichen
+    return fileName
+      .replace(/\.[^/.]+$/, '') // Entferne Dateiendung
+      .replace(/[_-]/g, ' ') // Ersetze _ und - durch Leerzeichen
+      .replace(/\b\w/g, l => l.toUpperCase()) // Kapitalisiere jeden Wortanfang
+  } catch {
+    return 'Datei'
+  }
+}
+
+// Hilfsfunktion: Generiert Alt-Text basierend auf vorhandenem Text oder Dateinamen
+const generateAltText = (existingAlt: string | undefined, url: string, projectName: string, mediaType: string = 'Bild'): string => {
+  if (existingAlt && existingAlt.trim()) {
+    return existingAlt
+  }
+  
+  const fileName = getFileNameFromUrl(url)
+  return `${projectName} - ${fileName}`
+}
 
 interface ProjectSectionProps {
   project: Project
@@ -29,6 +54,17 @@ interface MediaItem {
 const ProjectSection: React.FC<ProjectSectionProps> = ({ project, index, totalProjects }) => {
   // Refs für Videos, um später darauf zugreifen zu können
   const videoRefs = useRef<(HTMLVideoElement | null)[]>([])
+
+  // Drag Scroll Hook für horizontales Scrollen
+  const {
+    ref: mediaContainerRef,
+    isDragging,
+    events: dragEvents,
+  } = useDragScroll<HTMLDivElement>({
+    direction: 'horizontal',
+    sensitivity: 1.0,
+    momentumMultiplier: 0.92, // Sanftes Ausrollen
+  })
 
   // Tooltip State
   const [tooltipState, setTooltipState] = useState({
@@ -114,9 +150,12 @@ const ProjectSection: React.FC<ProjectSectionProps> = ({ project, index, totalPr
 
         // YouTube-Video verarbeiten
         if (item.mediaType === 'youtube' && item.youtubeUrl) {
+          // Für YouTube verwenden wir den Titel oder generieren einen aus der URL
+          const altText = item.youtubeTitle || generateAltText(undefined, item.youtubeUrl, project.projectName, 'YouTube Video')
+          
           return {
             url: item.youtubeUrl,
-            alt: item.youtubeTitle || `${project.projectName} - YouTube Video`,
+            alt: altText,
             type: 'youtube',
             embedUrl: item.youtubeEmbedUrl || undefined,
             thumbnailUrl: item.youtubeThumbnailUrl || undefined,
@@ -139,7 +178,7 @@ const ProjectSection: React.FC<ProjectSectionProps> = ({ project, index, totalPr
 
           return {
             url,
-            alt: item.video.alt || `${project.projectName} - Video`,
+            alt: generateAltText(item.video.alt, url, project.projectName, 'Video'),
             type: 'video',
           }
         }
@@ -158,7 +197,7 @@ const ProjectSection: React.FC<ProjectSectionProps> = ({ project, index, totalPr
 
           return {
             url,
-            alt: item.image.alt || `${project.projectName}`,
+            alt: generateAltText(item.image.alt, url, project.projectName, isVideo ? 'Video' : 'Bild'),
             type: isVideo ? 'video' : 'image',
           }
         }
@@ -225,7 +264,11 @@ const ProjectSection: React.FC<ProjectSectionProps> = ({ project, index, totalPr
 
   return (
     <section className="project-section" id={`project-${project.id}`}>
-      <div className="media-container">
+      <div
+        className={`media-container ${isDragging ? 'dragging' : ''}`}
+        ref={mediaContainerRef}
+        {...dragEvents}
+      >
         {processedMedia.map((media, i) =>
           media.type === 'video' ? (
             <video

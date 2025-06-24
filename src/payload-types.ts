@@ -69,6 +69,7 @@ export interface Config {
   collections: {
     users: User;
     media: Media;
+    'media-bulk': MediaBulk;
     about: About;
     projects: Project;
     'payload-locked-documents': PayloadLockedDocument;
@@ -79,6 +80,7 @@ export interface Config {
   collectionsSelect: {
     users: UsersSelect<false> | UsersSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
+    'media-bulk': MediaBulkSelect<false> | MediaBulkSelect<true>;
     about: AboutSelect<false> | AboutSelect<true>;
     projects: ProjectsSelect<false> | ProjectsSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
@@ -135,12 +137,17 @@ export interface User {
   password?: string | null;
 }
 /**
+ * Medien-Bibliothek für Bilder und Videos
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "media".
  */
 export interface Media {
   id: string;
-  alt: string;
+  /**
+   * Optional: Alt-Text für Barrierefreiheit. Wenn leer, wird automatisch der Dateiname verwendet.
+   */
+  alt?: string | null;
   /**
    * Optional: Thumbnail-Bild für Videos. Wird automatisch in der Suche und Vorschau angezeigt.
    */
@@ -156,34 +163,71 @@ export interface Media {
   height?: number | null;
   focalX?: number | null;
   focalY?: number | null;
+  sizes?: {
+    thumbnail?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
+    card?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
+  };
 }
 /**
- * Informationen für die About-Seite
+ * Mehrere Medien gleichzeitig hochladen
  *
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "about".
+ * via the `definition` "media-bulk".
  */
-export interface About {
+export interface MediaBulk {
   id: string;
-  name: string;
-  profileImage?: (string | null) | Media;
   /**
-   * Ihre Biographie als einfacher Text
+   * Name für diesen Batch-Upload (z.B. "Projekt XY Bilder")
    */
-  biography: string;
-  email: string;
-  phone?: string | null;
-  socialLinks?:
+  name: string;
+  /**
+   * Optional: Beschreibung für diesen Upload-Batch
+   */
+  description?: string | null;
+  /**
+   * Fügen Sie mehrere Bilder oder Videos hinzu
+   */
+  files?:
     | {
-        platform: 'instagram' | 'linkedin' | 'twitter' | 'facebook' | 'github' | 'other';
-        customPlatform?: string | null;
-        url: string;
+        /**
+         * Datei auswählen
+         */
+        file: string | Media;
+        /**
+         * Optional: Spezifischer Alt-Text für diese Datei (überschreibt automatische Generierung)
+         */
+        customAlt?: string | null;
+        /**
+         * Optional: Tags für bessere Organisation (komma-getrennt)
+         */
+        tags?: string | null;
         id?: string | null;
       }[]
     | null;
+  /**
+   * Optional: Verknüpfe diese Medien mit einem Projekt
+   */
+  project?: (string | null) | Project;
+  /**
+   * Automatisch alle Dateien zum ausgewählten Projekt hinzufügen
+   */
+  autoAddToProject?: boolean | null;
   updatedAt: string;
   createdAt: string;
-  _status?: ('draft' | 'published') | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -318,6 +362,34 @@ export interface Project {
   createdAt: string;
 }
 /**
+ * Informationen für die About-Seite
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "about".
+ */
+export interface About {
+  id: string;
+  name: string;
+  profileImage?: (string | null) | Media;
+  /**
+   * Ihre Biographie als einfacher Text
+   */
+  biography: string;
+  email: string;
+  phone?: string | null;
+  socialLinks?:
+    | {
+        platform: 'instagram' | 'linkedin' | 'twitter' | 'facebook' | 'github' | 'other';
+        customPlatform?: string | null;
+        url: string;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-locked-documents".
  */
@@ -331,6 +403,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'media';
         value: string | Media;
+      } | null)
+    | ({
+        relationTo: 'media-bulk';
+        value: string | MediaBulk;
       } | null)
     | ({
         relationTo: 'about';
@@ -415,6 +491,50 @@ export interface MediaSelect<T extends boolean = true> {
   height?: T;
   focalX?: T;
   focalY?: T;
+  sizes?:
+    | T
+    | {
+        thumbnail?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+        card?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+      };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "media-bulk_select".
+ */
+export interface MediaBulkSelect<T extends boolean = true> {
+  name?: T;
+  description?: T;
+  files?:
+    | T
+    | {
+        file?: T;
+        customAlt?: T;
+        tags?: T;
+        id?: T;
+      };
+  project?: T;
+  autoAddToProject?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

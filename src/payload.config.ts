@@ -9,6 +9,7 @@ import sharp from 'sharp'
 
 import { Users } from './collections/Users'
 import { Media } from './collections/Media'
+import { MediaBulk } from './collections/MediaBulk'
 import { About } from './collections/About'
 
 // Funktion zur Validierung von YouTube URLs
@@ -104,6 +105,7 @@ export default buildConfig({
   collections: [
     Users,
     Media,
+    MediaBulk,
     About,
     {
       slug: 'projects',

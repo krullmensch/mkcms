@@ -3,6 +3,29 @@
 import React from 'react'
 import escapeHTML from 'escape-html'
 
+// Hilfsfunktion: Extrahiert Dateinamen aus URL für Alt-Text
+const getFileNameFromUrl = (url: string): string => {
+  try {
+    const fileName = url.split('/').pop()?.split('?')[0] || 'Bild'
+    // Entferne Dateiendung und ersetze Unterstriche/Bindestriche durch Leerzeichen
+    return fileName
+      .replace(/\.[^/.]+$/, '') // Entferne Dateiendung
+      .replace(/[_-]/g, ' ') // Ersetze _ und - durch Leerzeichen
+      .replace(/\b\w/g, l => l.toUpperCase()) // Kapitalisiere jeden Wortanfang
+  } catch {
+    return 'Bild'
+  }
+}
+
+// Hilfsfunktion: Generiert Alt-Text basierend auf vorhandenem Text oder Dateinamen
+const generateAltText = (existingAlt: string | undefined, url: string): string => {
+  if (existingAlt && existingAlt.trim()) {
+    return existingAlt
+  }
+  
+  return getFileNameFromUrl(url)
+}
+
 type Node = {
   type: string
   value?: {
@@ -86,11 +109,12 @@ export const RichText: React.FC<{ content: any }> = ({ content }) => {
 
           case 'upload':
             if (value?.id) {
+              const imageUrl = `${process.env.NEXT_PUBLIC_SERVER_URL}/media/${value.filename}`
               return (
                 <div key={i} className="my-4">
                   <img
-                    src={`${process.env.NEXT_PUBLIC_SERVER_URL}/media/${value.filename}`}
-                    alt={value.alt || ''}
+                    src={imageUrl}
+                    alt={generateAltText(value.alt, imageUrl)}
                     className="max-w-full h-auto rounded"
                   />
                 </div>
