@@ -195,9 +195,9 @@ export interface Project {
   projectImages?:
     | {
         /**
-         * Wählen Sie aus, ob Sie ein Foto oder Video hochladen möchten.
+         * Wählen Sie aus, ob Sie ein Foto, Video oder YouTube-Video hinzufügen möchten.
          */
-        mediaType: 'image' | 'video';
+        mediaType: 'image' | 'video' | 'youtube';
         /**
          * Laden Sie Ihr Foto hoch.
          */
@@ -210,6 +210,42 @@ export interface Project {
          * Laden Sie ein Thumbnail-Bild für Ihr Video hoch (empfohlen für bessere Darstellung in Suchergebnissen).
          */
         videoThumbnail?: (string | null) | Media;
+        /**
+         * Geben Sie die vollständige YouTube-URL ein (z.B. https://www.youtube.com/watch?v=dQw4w9WgXcQ)
+         */
+        youtubeUrl?: string | null;
+        /**
+         * Optional: Titel für das YouTube Video (wird als Alt-Text verwendet)
+         */
+        youtubeTitle?: string | null;
+        /**
+         * Automatisch extrahierte Video ID (nur lesbar)
+         */
+        youtubeVideoId?: string | null;
+        /**
+         * Automatisch generierte Embed URL (nur lesbar)
+         */
+        youtubeEmbedUrl?: string | null;
+        /**
+         * Automatisch generierte Thumbnail URL (nur lesbar)
+         */
+        youtubeThumbnailUrl?: string | null;
+        /**
+         * Automatisch berechnetes Seitenverhältnis (Breite/Höhe)
+         */
+        youtubeAspectRatio?: number | null;
+        /**
+         * Automatisch erkannte Video-Orientierung
+         */
+        youtubeOrientation?: ('landscape' | 'portrait' | 'square') | null;
+        /**
+         * Originalbreite des Videos in Pixel
+         */
+        youtubeWidth?: number | null;
+        /**
+         * Originalhöhe des Videos in Pixel
+         */
+        youtubeHeight?: number | null;
         /**
          * Aktivieren Sie diese Option, um ein Standardbild zu verwenden, bis Sie ein eigenes Bild hochladen.
          */
@@ -242,7 +278,7 @@ export interface Project {
   /**
    * Wählen Sie einen oder mehrere Tags zur Kategorisierung des Projekts
    */
-  tags?: ('photo' | 'video' | '3d' | 'interactive' | 'rendering' | 'live' | 'projection')[] | null;
+  tags?: ('photo' | 'video' | 'youtube' | '3d' | 'interactive' | 'rendering' | 'live' | 'projection')[] | null;
   creationYear:
     | '2025'
     | '2024'
@@ -415,6 +451,15 @@ export interface ProjectsSelect<T extends boolean = true> {
         image?: T;
         video?: T;
         videoThumbnail?: T;
+        youtubeUrl?: T;
+        youtubeTitle?: T;
+        youtubeVideoId?: T;
+        youtubeEmbedUrl?: T;
+        youtubeThumbnailUrl?: T;
+        youtubeAspectRatio?: T;
+        youtubeOrientation?: T;
+        youtubeWidth?: T;
+        youtubeHeight?: T;
         useDefaultImage?: T;
         id?: T;
       };

@@ -23,9 +23,7 @@
   --link-bg: rgba(255, 255, 255, 0.1);
   --code-bg: rgba(255, 255, 255, 0.15);
   
-  /* Cursor-Variablen */
-  --cursor-color: #ffffff;
-  --cursor-dot-color: #ffffff;
+
 }
 
 /* Verstecke das Next.js DevTools-Icon */
@@ -415,73 +413,7 @@ main {
   opacity: 0.8;
 }
 
-/* Custom Cursor */
-.custom-cursor {
-  position: fixed;
-  width: 20px;
-  height: 20px;
-  border: 2px solid #ffffff;
-  border-radius: 50%;
-  pointer-events: none;
-  z-index: 9999;
-  transform: translate(-50%, -50%);
-  opacity: 0;
-  mix-blend-mode: difference;
-}
 
-.custom-cursor.visible {
-  opacity: 1;
-}
-
-.custom-cursor.hover {
-  /* Keine Größenänderung des Kreises, nur border-width reduzieren für visuellen Effekt */
-  border-width: 1px;
-}
-
-.custom-cursor .cursor-dot {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 80%;
-  height: 80%;
-  background: #ffffff;
-  border-radius: 50%;
-  transform: translate(-50%, -50%) scale(0);
-  transition: transform 0.15s ease;
-}
-
-.custom-cursor.hover .cursor-dot {
-  transform: translate(-50%, -50%) scale(1);
-}
-
-/* Hide default cursor */
-body {
-  cursor: none;
-}
-
-/* Hide default cursor on all interactive elements */
-a, button, [role="button"], .theme-toggle, .project-title h2, .scroll-arrow, .portfolio-header a, [data-tooltip], .search-button, .search-close, .search-result-item {
-  cursor: none !important;
-}
-
-/* Show default cursor on specific elements that need it */
-input, textarea, [contenteditable], .search-input {
-  cursor: text !important;
-}
-
-@media (max-width: 768px) {
-  .custom-cursor {
-    display: none;
-  }
-  
-  body {
-    cursor: auto;
-  }
-  
-  input, textarea, [contenteditable] {
-    cursor: text !important;
-  }
-}
 
 /* Responsive Design */
 @media (max-width: 1024px) {
@@ -1052,5 +984,159 @@ body {
 @media (max-width: 480px) {
   .search-results-grid {
     grid-template-columns: 1fr;
+  }
+}
+
+/* YouTube Video Styles */
+.youtube-container {
+  position: relative;
+  background: #000;
+  border-radius: 8px;
+  overflow: hidden;
+  height: 100%; /* Nimmt die volle Höhe des media-item ein */
+  /* Berechne die Breite basierend auf dem Seitenverhältnis und der Container-Höhe */
+  width: calc(66vh * var(--aspect-ratio, 1.78)); /* 66vh ist die media-container Höhe */
+  max-width: 90vw; /* Verhindere Überlauf bei sehr breiten Videos */
+}
+
+/* Spezifische Orientierungs-Styles */
+.youtube-container.landscape {
+  /* Für Querformat: Breite = Höhe × Seitenverhältnis */
+  width: calc(66vh * var(--aspect-ratio, 1.78));
+}
+
+.youtube-container.portrait {
+  /* Für Hochformat: Begrenzte Breite basierend auf Seitenverhältnis */
+  width: calc(66vh * var(--aspect-ratio, 0.56));
+  max-width: 40vw; /* Zusätzliche Begrenzung für Hochformat */
+}
+
+.youtube-container.square {
+  /* Für quadratische Videos: Höhe = Breite */
+  width: 66vh;
+  max-width: 60vw;
+}
+
+.youtube-iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+  border-radius: 8px;
+}
+
+.youtube-fallback {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: #000;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.youtube-fallback:hover {
+  background: rgba(0, 0, 0, 0.8);
+}
+
+.youtube-thumbnail {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.youtube-play-button {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  opacity: 0.9;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  cursor: pointer;
+}
+
+.youtube-fallback:hover .youtube-play-button {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1.1);
+}
+
+.youtube-link {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: white;
+  text-decoration: none;
+  background: rgba(0, 0, 0, 0.7);
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-size: 14px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.youtube-fallback:hover .youtube-link {
+  opacity: 1;
+}
+
+.youtube-link:hover {
+  background: rgba(0, 0, 0, 0.9);
+  color: #ff4444;
+}
+
+/* Responsive YouTube Videos */
+@media (max-width: 768px) {
+  .youtube-container.landscape {
+    width: calc(66vh * var(--aspect-ratio, 1.78));
+    max-width: 85vw;
+  }
+  
+  .youtube-container.portrait {
+    width: calc(66vh * var(--aspect-ratio, 0.56));
+    max-width: 50vw;
+  }
+  
+  .youtube-container.square {
+    width: 66vh;
+    max-width: 70vw;
+  }
+  
+  .youtube-play-button svg {
+    width: 48px;
+    height: 36px;
+  }
+  
+  .youtube-link {
+    font-size: 12px;
+    padding: 6px 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .youtube-container.landscape {
+    width: calc(66vh * var(--aspect-ratio, 1.78));
+    max-width: 90vw;
+  }
+  
+  .youtube-container.portrait {
+    width: calc(66vh * var(--aspect-ratio, 0.56));
+    max-width: 60vw;
+  }
+  
+  .youtube-container.square {
+    width: 66vh;
+    max-width: 80vw;
+  }
+  
+  .youtube-play-button svg {
+    width: 40px;
+    height: 30px;
   }
 }

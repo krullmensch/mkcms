@@ -12,6 +12,18 @@ const nextConfig = {
         port: '3000',
         pathname: '/api/media/**',
       },
+      // YouTube Thumbnails
+      {
+        protocol: 'https',
+        hostname: 'img.youtube.com',
+        pathname: '/vi/**',
+      },
+      // Placeholder Images
+      {
+        protocol: 'https',
+        hostname: 'via.placeholder.com',
+        pathname: '/**',
+      },
     ],
   },
 }

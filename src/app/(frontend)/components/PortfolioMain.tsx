@@ -1,11 +1,10 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { Project } from '@/payload-types'
 import PortfolioHeader from './PortfolioHeader'
 import NameIntro from './NameIntro'
 import ProjectSection from './ProjectSection'
-import CustomCursor from './CustomCursor'
 import SearchButton from './SearchButton'
 
 interface PortfolioMainProps {
@@ -14,7 +13,7 @@ interface PortfolioMainProps {
 
 const PortfolioMain: React.FC<PortfolioMainProps> = ({ projects }) => {
   const [showIntro, setShowIntro] = useState(false)
-  
+
   // Titel-Animation ist deaktiviert - showIntro bleibt immer false
   // useEffect(() => {
   //   const hasSeenIntro = sessionStorage.getItem('hasSeenIntro')
@@ -32,20 +31,19 @@ const PortfolioMain: React.FC<PortfolioMainProps> = ({ projects }) => {
 
   return (
     <div className="portfolio-container">
-      <CustomCursor />
       {showIntro && <NameIntro onAnimationComplete={handleAnimationComplete} />}
-      
+
       <PortfolioHeader isVisible={!showIntro} />
-      
+
       {/* Search Button - nur anzeigen wenn Intro vorbei ist */}
       {!showIntro && <SearchButton projects={projects} />}
 
       {totalProjects > 0 ? (
         <>
           {projects.map((project, index) => (
-            <ProjectSection 
-              key={project.id} 
-              project={project} 
+            <ProjectSection
+              key={project.id}
+              project={project}
               index={index}
               totalProjects={totalProjects}
             />
