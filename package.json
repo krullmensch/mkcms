@@ -27,6 +27,7 @@
     "graphql": "^16.8.1",
     "next": "15.3.0",
     "payload": "3.33.0",
+    "puppeteer": "^24.10.2",
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "sharp": "0.32.6"
@@ -48,6 +49,9 @@
   "pnpm": {
     "onlyBuiltDependencies": [
       "sharp"
+    ],
+    "ignoredBuiltDependencies": [
+      "puppeteer"
     ]
   }
 }

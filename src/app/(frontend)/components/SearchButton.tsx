@@ -10,15 +10,15 @@ interface SearchButtonProps {
 // Alle verfügbaren Tags aus dem Backend
 const AVAILABLE_TAGS = [
   'photo',
-  'video', 
+  'video',
   '3d',
   'interactive',
   'rendering',
   'live',
-  'projection'
+  'projection',
 ] as const
 
-type TagType = typeof AVAILABLE_TAGS[number]
+type TagType = (typeof AVAILABLE_TAGS)[number]
 
 const SearchButton: React.FC<SearchButtonProps> = ({ projects }) => {
   const [isSearchOpen, setIsSearchOpen] = useState(false)
@@ -42,16 +42,17 @@ const SearchButton: React.FC<SearchButtonProps> = ({ projects }) => {
 
     // Text-Suche
     if (searchTerm.trim() !== '') {
-      filtered = filtered.filter(project => 
-        project.projectName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        project.shortDescription?.toLowerCase().includes(searchTerm.toLowerCase())
+      filtered = filtered.filter(
+        (project) =>
+          project.projectName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          project.shortDescription?.toLowerCase().includes(searchTerm.toLowerCase()),
       )
     }
 
     // Tag-Filter
     if (selectedTags.length > 0) {
-      filtered = filtered.filter(project => 
-        project.tags?.some((tag: any) => selectedTags.includes(tag as TagType))
+      filtered = filtered.filter((project) =>
+        project.tags?.some((tag: any) => selectedTags.includes(tag as TagType)),
       )
     }
 
@@ -59,11 +60,7 @@ const SearchButton: React.FC<SearchButtonProps> = ({ projects }) => {
   }, [searchTerm, selectedTags, projects])
 
   const handleTagToggle = (tag: TagType) => {
-    setSelectedTags(prev => 
-      prev.includes(tag) 
-        ? prev.filter(t => t !== tag)
-        : [...prev, tag]
-    )
+    setSelectedTags((prev) => (prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]))
   }
 
   const handleSearchToggle = () => {
@@ -87,9 +84,9 @@ const SearchButton: React.FC<SearchButtonProps> = ({ projects }) => {
     // Scroll zu dem entsprechenden Projekt
     const projectElement = document.getElementById(`project-${projectId}`)
     if (projectElement) {
-      projectElement.scrollIntoView({ 
+      projectElement.scrollIntoView({
         behavior: 'smooth',
-        block: 'start'
+        block: 'start',
       })
       // Starte Fade-out Animation
       setIsClosing(true)
@@ -106,24 +103,35 @@ const SearchButton: React.FC<SearchButtonProps> = ({ projects }) => {
   // Hilfsfunktion um das erste Projektbild zu holen oder Video-Thumbnail zu verwenden
   const getProjectThumbnail = (project: Project): string => {
     const DEFAULT_IMAGE = 'https://via.placeholder.com/300x200?text=Projekt+Vorschau'
-    
+
     if (!project.projectImages || project.projectImages.length === 0) {
       return DEFAULT_IMAGE
     }
 
     // Suche nach einem Media-Item (entweder Bild oder Video)
-    const mediaItem = project.projectImages.find(item => 
-      (item.image && typeof item.image === 'object' && item.image !== null && 'url' in item.image) ||
-      (item.video && typeof item.video === 'object' && item.video !== null && 'url' in item.video)
+    const mediaItem = project.projectImages.find(
+      (item) =>
+        (item.image &&
+          typeof item.image === 'object' &&
+          item.image !== null &&
+          'url' in item.image) ||
+        (item.video &&
+          typeof item.video === 'object' &&
+          item.video !== null &&
+          'url' in item.video),
     )
-    
+
     if (!mediaItem) {
       return DEFAULT_IMAGE
     }
 
     // Wenn es ein Video ist, prüfe auf videoThumbnail
     if (mediaItem.mediaType === 'video' && mediaItem.videoThumbnail) {
-      if (typeof mediaItem.videoThumbnail === 'object' && mediaItem.videoThumbnail !== null && 'url' in mediaItem.videoThumbnail) {
+      if (
+        typeof mediaItem.videoThumbnail === 'object' &&
+        mediaItem.videoThumbnail !== null &&
+        'url' in mediaItem.videoThumbnail
+      ) {
         return mediaItem.videoThumbnail.url || DEFAULT_IMAGE
       }
       if (typeof mediaItem.videoThumbnail === 'string') {
@@ -132,18 +140,27 @@ const SearchButton: React.FC<SearchButtonProps> = ({ projects }) => {
     }
 
     // Wenn es ein Video ist aber kein videoThumbnail vorhanden ist, verwende das Video selbst
-    if (mediaItem.mediaType === 'video' && mediaItem.video && typeof mediaItem.video === 'object' && 'url' in mediaItem.video) {
+    if (
+      mediaItem.mediaType === 'video' &&
+      mediaItem.video &&
+      typeof mediaItem.video === 'object' &&
+      'url' in mediaItem.video
+    ) {
       return mediaItem.video.url || DEFAULT_IMAGE
     }
-    
+
     // Für Bilder oder als Fallback
     if (mediaItem.image && typeof mediaItem.image === 'object' && 'url' in mediaItem.image) {
       const media = mediaItem.image
-      
+
       // Prüfe, ob es sich um ein Video handelt und ein Thumbnail verfügbar ist (Legacy-Support)
       if (media.mimeType?.startsWith('video/') && media.thumbnail) {
         // Wenn thumbnail ein Objekt ist (Media-Referenz)
-        if (typeof media.thumbnail === 'object' && media.thumbnail !== null && 'url' in media.thumbnail) {
+        if (
+          typeof media.thumbnail === 'object' &&
+          media.thumbnail !== null &&
+          'url' in media.thumbnail
+        ) {
           return media.thumbnail.url || DEFAULT_IMAGE
         }
         // Wenn thumbnail ein String ist (direkte URL)
@@ -151,11 +168,11 @@ const SearchButton: React.FC<SearchButtonProps> = ({ projects }) => {
           return media.thumbnail
         }
       }
-      
+
       // Fallback auf das eigentliche Media-File (für Bilder oder Videos ohne Thumbnail)
       return media.url || DEFAULT_IMAGE
     }
-    
+
     return DEFAULT_IMAGE
   }
 
@@ -180,24 +197,24 @@ const SearchButton: React.FC<SearchButtonProps> = ({ projects }) => {
         aria-label="Suche öffnen"
         title="Projekte durchsuchen"
       >
-        <svg 
-          width="24" 
-          height="24" 
-          viewBox="0 0 24 24" 
-          fill="none" 
-          stroke="currentColor" 
+        <svg
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
           strokeWidth="2"
-          strokeLinecap="round" 
+          strokeLinecap="round"
           strokeLinejoin="round"
         >
-          <circle cx="11" cy="11" r="8"/>
-          <path d="m21 21-4.35-4.35"/>
+          <circle cx="11" cy="11" r="8" />
+          <path d="m21 21-4.35-4.35" />
         </svg>
       </button>
 
       {/* Such-Overlay */}
       {isSearchOpen && (
-        <div 
+        <div
           ref={searchOverlayRef}
           className={`search-overlay ${isClosing ? 'closing' : ''}`}
           onClick={handleOverlayClick}
@@ -205,19 +222,19 @@ const SearchButton: React.FC<SearchButtonProps> = ({ projects }) => {
         >
           <div className="search-container">
             <div className="search-input-wrapper">
-              <svg 
+              <svg
                 className="search-icon"
-                width="20" 
-                height="20" 
-                viewBox="0 0 24 24" 
-                fill="none" 
-                stroke="currentColor" 
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
                 strokeWidth="2"
-                strokeLinecap="round" 
+                strokeLinecap="round"
                 strokeLinejoin="round"
               >
-                <circle cx="11" cy="11" r="8"/>
-                <path d="m21 21-4.35-4.35"/>
+                <circle cx="11" cy="11" r="8" />
+                <path d="m21 21-4.35-4.35" />
               </svg>
               <input
                 ref={searchInputRef}
@@ -233,18 +250,18 @@ const SearchButton: React.FC<SearchButtonProps> = ({ projects }) => {
                 className="search-close"
                 aria-label="Suche schließen"
               >
-                <svg 
-                  width="20" 
-                  height="20" 
-                  viewBox="0 0 24 24" 
-                  fill="none" 
-                  stroke="currentColor" 
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
                   strokeWidth="2"
-                  strokeLinecap="round" 
+                  strokeLinecap="round"
                   strokeLinejoin="round"
                 >
-                  <line x1="18" y1="6" x2="6" y2="18"/>
-                  <line x1="6" y1="6" x2="18" y2="18"/>
+                  <line x1="18" y1="6" x2="6" y2="18" />
+                  <line x1="6" y1="6" x2="18" y2="18" />
                 </svg>
               </button>
             </div>
@@ -263,10 +280,7 @@ const SearchButton: React.FC<SearchButtonProps> = ({ projects }) => {
                   </button>
                 ))}
                 {selectedTags.length > 0 && (
-                  <button
-                    onClick={() => setSelectedTags([])}
-                    className="search-tags-clear"
-                  >
+                  <button onClick={() => setSelectedTags([])} className="search-tags-clear">
                     Alle entfernen
                   </button>
                 )}
@@ -279,10 +293,12 @@ const SearchButton: React.FC<SearchButtonProps> = ({ projects }) => {
                 {filteredProjects.length > 0 ? (
                   <>
                     <div className="search-results-header">
-                      {filteredProjects.length} Projekt{filteredProjects.length !== 1 ? 'e' : ''} gefunden
+                      {filteredProjects.length} Projekt{filteredProjects.length !== 1 ? 'e' : ''}{' '}
+                      gefunden
                       {selectedTags.length > 0 && (
                         <span className="search-active-filters">
-                          {' '}mit Tag{selectedTags.length > 1 ? 's' : ''}: {selectedTags.join(', ')}
+                          {' '}
+                          mit Tag{selectedTags.length > 1 ? 's' : ''}: {selectedTags.join(', ')}
                         </span>
                       )}
                     </div>
@@ -294,18 +310,21 @@ const SearchButton: React.FC<SearchButtonProps> = ({ projects }) => {
                           className="search-result-card"
                         >
                           <div className="search-result-thumbnail">
-                            <img 
-                              src={getProjectThumbnail(project)} 
+                            <img
+                              src={getProjectThumbnail(project)}
                               alt={project.projectName || 'Projekt Thumbnail'}
                               onError={(e) => {
-                                e.currentTarget.src = 'https://via.placeholder.com/300x200?text=Projekt+Vorschau'
+                                e.currentTarget.src =
+                                  'https://via.placeholder.com/300x200?text=Projekt+Vorschau'
                               }}
                             />
                           </div>
                           <div className="search-result-content">
                             <div className="search-result-title">{project.projectName}</div>
-                            {project.creationYear && (
-                              <div className="search-result-year">{project.creationYear}</div>
+                            {project.creationDate && (
+                              <div className="search-result-year">
+                                {new Date(project.creationDate).getFullYear()}
+                              </div>
                             )}
                             {project.shortDescription && (
                               <div className="search-result-description">

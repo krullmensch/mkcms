@@ -6,6 +6,7 @@ import PortfolioHeader from './PortfolioHeader'
 import NameIntro from './NameIntro'
 import ProjectSection from './ProjectSection'
 import SearchButton from './SearchButton'
+import InfoButton from './InfoButton'
 
 interface PortfolioMainProps {
   projects: Project[]
@@ -35,8 +36,13 @@ const PortfolioMain: React.FC<PortfolioMainProps> = ({ projects }) => {
 
       <PortfolioHeader isVisible={!showIntro} />
 
-      {/* Search Button - nur anzeigen wenn Intro vorbei ist */}
-      {!showIntro && <SearchButton projects={projects} />}
+      {/* Search Button und Info Button - nur anzeigen wenn Intro vorbei ist */}
+      {!showIntro && (
+        <>
+          <SearchButton projects={projects} />
+          <InfoButton />
+        </>
+      )}
 
       {totalProjects > 0 ? (
         <>

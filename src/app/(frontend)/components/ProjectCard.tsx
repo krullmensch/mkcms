@@ -120,7 +120,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, showScrollArr
           return {
             url: thumbnailUrl,
             alt: generateAltText(
-              firstImage.alt,
+              firstImage.alt || undefined,
               thumbnailUrl,
               project.projectName,
               'Video Thumbnail',
@@ -132,7 +132,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, showScrollArr
           return {
             url: firstImage.thumbnail,
             alt: generateAltText(
-              firstImage.alt,
+              firstImage.alt || undefined,
               firstImage.thumbnail,
               project.projectName,
               'Video Thumbnail',
@@ -145,7 +145,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, showScrollArr
       const imageUrl = firstImage.url || DEFAULT_IMAGE_URL
       return {
         url: imageUrl,
-        alt: generateAltText(firstImage.alt, imageUrl, project.projectName),
+        alt: generateAltText(firstImage.alt || undefined, imageUrl, project.projectName),
       }
     }
 
@@ -183,7 +183,9 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, showScrollArr
           </div>
         )}
 
-        {project.creationYear && <p className="project-year">{project.creationYear}</p>}
+        {project.creationDate && (
+          <p className="project-year">{new Date(project.creationDate).getFullYear()}</p>
+        )}
         {project.description && (
           <div className="project-description">
             {/* Hier könnte eine Kurzfassung der Beschreibung angezeigt werden */}

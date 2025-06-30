@@ -79,22 +79,6 @@ async function fetchYouTubeVideoInfo(videoId: string): Promise<any> {
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 
-// Generate year options for dropdown
-function generateYearOptions() {
-  const currentYear = new Date().getFullYear()
-  const startYear = 2000 // Startjahr
-  const years = []
-
-  for (let year = currentYear; year >= startYear; year--) {
-    years.push({
-      label: year.toString(),
-      value: year.toString(),
-    })
-  }
-
-  return years
-}
-
 export default buildConfig({
   admin: {
     user: Users.slug,
@@ -473,11 +457,17 @@ export default buildConfig({
           },
         },
         {
-          name: 'creationYear',
-          type: 'select',
-          label: 'Erstellungsjahr',
+          name: 'creationDate',
+          type: 'date',
+          label: 'Erstellungsdatum',
           required: true,
-          options: generateYearOptions(),
+          admin: {
+            description: 'Datum der Projekterstellung (für chronologische Sortierung)',
+            date: {
+              pickerAppearance: 'dayAndTime',
+              displayFormat: 'dd.MM.yyyy',
+            },
+          },
         },
         {
           name: 'status',

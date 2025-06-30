@@ -4,7 +4,6 @@ import Image from 'next/image'
 import React, { useEffect, useRef, useState } from 'react'
 import ProjectTooltip from './ProjectTooltip'
 import { Project } from '@/payload-types'
-import { useDragScroll } from '../hooks/useDragScroll'
 
 // Standard Platzhalterbild
 const DEFAULT_IMAGE_URL = 'https://via.placeholder.com/1200x800?text=Projekt+Vorschau'
@@ -57,19 +56,9 @@ interface MediaItem {
 }
 
 const ProjectSection: React.FC<ProjectSectionProps> = ({ project, index, totalProjects }) => {
-  // Refs für Videos, um später darauf zugreifen zu können
+  // Refs für Videos und Media Container
   const videoRefs = useRef<(HTMLVideoElement | null)[]>([])
-
-  // Drag Scroll Hook für horizontales Scrollen
-  const {
-    ref: mediaContainerRef,
-    isDragging,
-    events: dragEvents,
-  } = useDragScroll<HTMLDivElement>({
-    direction: 'horizontal',
-    sensitivity: 1.0,
-    momentumMultiplier: 0.92, // Sanftes Ausrollen
-  })
+  const mediaContainerRef = useRef<HTMLDivElement>(null)
 
   // Tooltip State
   const [tooltipState, setTooltipState] = useState({
@@ -185,7 +174,7 @@ const ProjectSection: React.FC<ProjectSectionProps> = ({ project, index, totalPr
 
           return {
             url,
-            alt: generateAltText(item.video.alt, url, project.projectName, 'Video'),
+            alt: generateAltText(item.video.alt || undefined, url, project.projectName, 'Video'),
             type: 'video',
           }
         }
@@ -205,7 +194,7 @@ const ProjectSection: React.FC<ProjectSectionProps> = ({ project, index, totalPr
           return {
             url,
             alt: generateAltText(
-              item.image.alt,
+              item.image.alt || undefined,
               url,
               project.projectName,
               isVideo ? 'Video' : 'Bild',
@@ -276,11 +265,7 @@ const ProjectSection: React.FC<ProjectSectionProps> = ({ project, index, totalPr
 
   return (
     <section className="project-section" id={`project-${project.id}`}>
-      <div
-        className={`media-container ${isDragging ? 'dragging' : ''}`}
-        ref={mediaContainerRef}
-        {...dragEvents}
-      >
+      <div className="media-container" ref={mediaContainerRef}>
         {processedMedia.map((media, i) =>
           media.type === 'video' ? (
             <video
@@ -370,7 +355,7 @@ const ProjectSection: React.FC<ProjectSectionProps> = ({ project, index, totalPr
       >
         <h2>
           {project.projectName}
-          {project.creationYear && `_${project.creationYear}`}
+          {project.creationDate && `_${new Date(project.creationDate).getFullYear()}`}
         </h2>
       </div>
 
