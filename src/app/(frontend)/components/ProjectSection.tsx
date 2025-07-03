@@ -60,6 +60,9 @@ const ProjectSection: React.FC<ProjectSectionProps> = ({ project, index, totalPr
   const videoRefs = useRef<(HTMLVideoElement | null)[]>([])
   const mediaContainerRef = useRef<HTMLDivElement>(null)
 
+  // Video State Management
+  const [videoStates, setVideoStates] = useState<{ [key: number]: { muted: boolean } }>({})
+
   // Tooltip State
   const [tooltipState, setTooltipState] = useState({
     isVisible: false,
@@ -109,6 +112,18 @@ const ProjectSection: React.FC<ProjectSectionProps> = ({ project, index, totalPr
       ...prev,
       mousePosition: { x: event.clientX, y: event.clientY },
     }))
+  }
+
+  // Video Control Functions
+  const toggleVideoMute = (index: number) => {
+    const video = videoRefs.current[index]
+    if (video) {
+      video.muted = !video.muted
+      setVideoStates(prev => ({
+        ...prev,
+        [index]: { muted: video.muted }
+      }))
+    }
   }
 
   // Verarbeiten der Projektbilder
@@ -268,21 +283,44 @@ const ProjectSection: React.FC<ProjectSectionProps> = ({ project, index, totalPr
       <div className="media-container" ref={mediaContainerRef}>
         {processedMedia.map((media, i) =>
           media.type === 'video' ? (
-            <video
-              key={i}
-              className="media-item"
-              // Entferne controls
-              autoPlay={false} // Anfangs deaktiviert, wird durch den Observer gesteuert
-              loop
-              muted
-              playsInline
-              ref={(el) => {
-                videoRefs.current[i] = el
-              }}
-            >
-              <source src={media.url} type={`video/${media.url.split('.').pop()}`} />
-              Dein Browser unterstützt das Video-Tag nicht.
-            </video>
+            <div key={i} className="video-wrapper">
+              <video
+                className="media-item"
+                autoPlay={false} // Anfangs deaktiviert, wird durch den Observer gesteuert
+                loop
+                muted
+                playsInline
+                ref={(el) => {
+                  videoRefs.current[i] = el
+                  // Initialisiere Video State
+                  if (el && !videoStates[i]) {
+                    setVideoStates(prev => ({
+                      ...prev,
+                      [i]: { muted: true }
+                    }))
+                  }
+                }}
+              >
+                <source src={media.url} type={`video/${media.url.split('.').pop()}`} />
+                Dein Browser unterstützt das Video-Tag nicht.
+              </video>
+              {/* Unmute Button */}
+              <button
+                className="video-unmute-btn"
+                onClick={() => toggleVideoMute(i)}
+                aria-label={videoStates[i]?.muted ? 'Video entmuten' : 'Video stummschalten'}
+              >
+                {videoStates[i]?.muted ? (
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M16.5 12C16.5 10.23 15.5 8.71 14 7.97V10.18L16.45 12.63C16.48 12.43 16.5 12.22 16.5 12ZM19 12C19 12.94 18.8 13.82 18.46 14.64L19.97 16.15C20.63 14.91 21 13.5 21 12C21 7.72 18 4.14 14 3.23V5.29C16.89 6.15 19 8.83 19 12ZM4.27 3L3 4.27L7.73 9H3V15H7L12 20V13.27L16.25 17.52C15.58 18.04 14.83 18.46 14 18.7V20.77C15.38 20.45 16.63 19.82 17.68 18.96L19.73 21L21 19.73L12 10.73L4.27 3ZM12 4L9.91 6.09L12 8.18V4Z" fill="currentColor"/>
+                  </svg>
+                ) : (
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M3 9V15H7L12 20V4L7 9H3ZM16.5 12C16.5 10.23 15.5 8.71 14 7.97V16.02C15.5 15.29 16.5 13.77 16.5 12ZM14 3.23V5.29C16.89 6.15 19 8.83 19 12S16.89 17.85 14 18.71V20.77C18.01 19.86 21 16.28 21 12S18.01 4.14 14 3.23Z" fill="currentColor"/>
+                  </svg>
+                )}
+              </button>
+            </div>
           ) : media.type === 'youtube' ? (
             <div
               key={i}
@@ -355,7 +393,11 @@ const ProjectSection: React.FC<ProjectSectionProps> = ({ project, index, totalPr
       >
         <h2>
           {project.projectName}
-          {project.creationDate && `_${new Date(project.creationDate).getFullYear()}`}
+          {project.creationDate && (
+            <span className="project-year">
+              {' '}{new Date(project.creationDate).getFullYear()}
+            </span>
+          )}
         </h2>
       </div>
 

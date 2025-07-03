@@ -15,7 +15,7 @@ const PortfolioHeader: React.FC<PortfolioHeaderProps> = ({ isVisible = true }) =
     <>
       <header className="portfolio-header">
         <h1>
-          <Link href="/">MARVIN KRULLMANN</Link>
+          <Link href="/">Marvin Krullmann</Link>
         </h1>
       </header>
       

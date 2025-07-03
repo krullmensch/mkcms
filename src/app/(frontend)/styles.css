@@ -1,6 +1,6 @@
 :root {
   --font-mono: 'Roboto Mono', monospace;
-  --font-sans: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-sans: 'Questrial', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   --bg-color: #000000;
   --text-color: #ffffff;
   --text-secondary: rgba(255, 255, 255, 0.7);
@@ -54,6 +54,8 @@ html {
   background: var(--bg-color);
   -webkit-font-smoothing: antialiased;
   scroll-snap-type: y mandatory;
+  overscroll-behavior: contain;
+  touch-action: pan-y;
   height: 100%;
 }
 
@@ -70,6 +72,7 @@ body {
   background-color: var(--bg-color);
   color: var(--text-color);
   overflow-x: hidden;
+  font-display: swap; /* Für bessere Web-Font-Performance */
 
   @media (max-width: 1024px) {
     font-size: 15px;
@@ -85,7 +88,7 @@ img {
 
 h1 {
   margin: 40px 0;
-  font-size: 120rem;
+  font-size: 4rem; /* Korrigiere die Schriftgröße von 120rem */
   line-height: 70px;
   font-weight: bold;
 
@@ -213,7 +216,7 @@ main {
 /* Portfolio Navigation */
 .portfolio-header {
   position: fixed;
-  top: var(--spacing-md);
+  top: calc(var(--spacing-md) * 3); /* Weiter nach unten verschoben */
   left: var(--spacing-md);
   z-index: 200; /* Über der Welle */
 }
@@ -234,13 +237,18 @@ main {
   height: 100vh;
   width: 100%;
   scroll-snap-align: start;
+  scroll-snap-stop: always; /* Zwingt den Browser bei jeder Section zu stoppen */
   position: relative;
   overflow: hidden;
+  
+  /* Zusätzliche Stabilisierung für Touch-Geräte */
+  overscroll-behavior: contain;
+  touch-action: pan-y;
 }
 
 .project-title {
   position: absolute;
-  bottom: var(--spacing-md);
+  bottom: calc(var(--spacing-md) * 2); /* Höher positioniert, mehr Abstand zum Pfeil */
   left: var(--spacing-md);
   z-index: 100; /* Über der Welle */
 }
@@ -252,6 +260,9 @@ main {
   transition: all 0.3s ease;
   cursor: default;
   position: relative;
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
 }
 
 .project-title h2:hover {
@@ -260,9 +271,10 @@ main {
 }
 
 .project-year {
-  font-size: 1rem;
-  color: var(--text-secondary);
-  margin-top: 0.25rem;
+  font-size: 1.2rem; /* Kleinere Schriftgröße für das Jahr */
+  color: var(--text-secondary); /* Grauton */
+  font-weight: 300; /* Leichtere Schrift */
+  opacity: 0.8;
 }
 
 /* Project Media Container */
@@ -274,14 +286,14 @@ main {
   width: 100%;
   height: 66vh;
   display: flex;
+  align-items: center; /* Zentriere alle Media-Items vertikal */
   overflow-x: auto;
   overflow-y: hidden;
-  scroll-behavior: smooth;
   gap: var(--spacing-sm);
   padding: 0 var(--spacing-md);
   z-index: 80;
   
-  /* Standard horizontales Scrolling */
+  /* Verstecke Scrollbars */
   scrollbar-width: none; /* Firefox */
   -ms-overflow-style: none; /* IE und Edge */
 }
@@ -297,6 +309,51 @@ main {
   max-height: 66vh;
   width: auto;
   object-fit: contain;
+}
+
+/* Video Wrapper and Controls */
+.video-wrapper {
+  position: relative;
+  flex: 0 0 auto;
+  height: 100%;
+  max-height: 66vh;
+  width: auto;
+}
+
+.video-wrapper video {
+  height: 100%;
+  max-height: 66vh;
+  width: auto;
+  object-fit: contain;
+}
+
+.video-unmute-btn {
+  position: absolute;
+  bottom: 1rem;
+  right: 1rem;
+  background: rgba(0, 0, 0, 0.7);
+  border: none;
+  border-radius: 50%;
+  width: 48px;
+  height: 48px;
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+  z-index: 10;
+}
+
+.video-unmute-btn:hover {
+  background: rgba(0, 0, 0, 0.9);
+  transform: scale(1.1);
+}
+
+.video-unmute-btn svg {
+  width: 24px;
+  height: 24px;
 }
 
 /* Scroll Arrow Styles */
@@ -427,17 +484,176 @@ main {
 
 /* Responsive Design */
 @media (max-width: 1024px) {
-  /* Placeholder für zukünftige Responsive Styles */
+  /* Tablet-Optimierungen */
+  .media-container {
+    justify-content: center; /* Zentriere Media-Items horizontal bei Tablet */
+    padding: 0 var(--spacing-sm);
+    scroll-snap-type: x mandatory; /* Horizontales Snap-Scrolling */
+    scroll-behavior: smooth;
+  }
+  
+  .media-item, .video-wrapper {
+    scroll-snap-align: center; /* Snap zu center bei jedem Item */
+    scroll-snap-stop: always;
+  }
+  
+  .scroll-arrow {
+    animation: bounceTablet 2s infinite;
+    /* Vergrößere Touch-Bereich */
+    padding: 1rem;
+    margin: -1rem;
+  }
+  
+  .portfolio-header h1 {
+    font-size: 1.75rem; /* Kleinere Schrift auf Tablet */
+  }
 }
 
 @media (max-width: 768px) {
-  /* Placeholder für zukünftige Responsive Styles */
+  /* Mobile-Optimierungen */
+  .media-container {
+    justify-content: flex-start; /* Beginne links für korrekte Startposition */
+    padding: 1rem; /* Symmetrisches Padding */
+    height: 60vh; /* Etwas kleiner auf Mobile */
+    scroll-snap-type: x mandatory; /* Horizontales Snap-Scrolling */
+    scroll-behavior: smooth;
+    /* Verbessertes Touch-Scrolling */
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-x: contain;
+    gap: 1rem; /* Mehr Abstand zwischen Items */
+  }
+  
+  .media-item, .video-wrapper {
+    max-height: 60vh;
+    scroll-snap-align: center; /* Snap zum Center für bessere Zentrierung */
+    scroll-snap-stop: always;
+    /* Mobile-spezifische Breitenanpassung - erstes Element sichtbar */
+    width: auto; /* Auto-Breite für natürliche Zentrierung */
+    max-width: calc(100vw - 4rem); /* Berücksichtige das symmetrische Padding */
+    min-width: calc(50vw); /* Mindestbreite für gute Sichtbarkeit */
+    flex-shrink: 0;
+    /* Zentriere jedes einzelne Media-Item */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .media-item img,
+  .video-wrapper video {
+    width: auto; /* Auto-Breite für Aspect-Ratio */
+    height: auto;
+    max-height: 60vh;
+    max-width: 100%;
+    object-fit: contain;
+  }
+  
+  .scroll-arrow {
+    bottom: 3rem; /* Mehr Abstand unten auf Mobile */
+    animation: bounceMobile 2s infinite;
+    /* Noch größerer Touch-Bereich */
+    padding: 1.5rem;
+    margin: -1.5rem;
+  }
+  
+  .portfolio-header {
+    top: calc(var(--spacing-md) * 2.5); /* Anpassung für Mobile */
+  }
+  
+  .portfolio-header h1 {
+    font-size: 1.5rem; /* Kleinere Header-Schrift auf Mobile */
+  }
+  
+  .project-title h2 {
+    font-size: 1.5rem; /* Kleinere Projekt-Titel auf Mobile */
+  }
+  
+  .project-year {
+    font-size: 1rem; /* Angepasste Jahr-Größe für Mobile */
+  }
+}
+
+@media (max-width: 480px) {
+  /* Sehr kleine Mobile-Bildschirme */
+  .media-container {
+    padding: 0.75rem; /* Symmetrisches Padding */
+    height: 55vh; /* Noch kompakter */
+    gap: 0.75rem;
+  }
+  
+  .media-item, .video-wrapper {
+    max-height: 55vh;
+    /* Responsive Größenanpassung für sehr kleine Displays */
+    max-width: calc(100vw - 3rem); /* Angepasst für symmetrisches Padding */
+    min-width: calc(60vw); /* Größere Mindestbreite für bessere Sichtbarkeit */
+  }
+  
+  .media-item img,
+  .video-wrapper video {
+    width: auto;
+    height: auto;
+    max-height: 55vh;
+    max-width: 100%;
+    object-fit: contain;
+  }
+  
+  .portfolio-header h1 {
+    font-size: 1.25rem; /* Noch kleinere Schrift */
+  }
+  
+  .project-title h2 {
+    font-size: 1.25rem;
+  }
+  
+  .project-year {
+    font-size: 0.875rem; /* Noch kleinere Jahr-Größe für sehr kleine Displays */
+  }
+  
+  .project-title {
+    bottom: calc(var(--spacing-sm) * 2); /* Mehr Abstand vom Pfeil bei kleinen Screens */
+    left: var(--spacing-sm);
+  }
+  
+  .scroll-arrow {
+    bottom: 2rem;
+  }
+  
+  /* YouTube-Container Mobile-Optimierung */
+  .youtube-container {
+    margin: 0 auto; /* Zusätzliche Zentrierung */
+    width: 100% !important; /* Überschreibe andere Breiten-Regeln */
+    max-width: calc(100vw - 2rem) !important;
+  }
+}
+
+/* Responsive Scroll-Arrow Animationen */
+@keyframes bounceTablet {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateX(-50%) translateY(0);
+  }
+  40% {
+    transform: translateX(-50%) translateY(-8px);
+  }
+  60% {
+    transform: translateX(-50%) translateY(-4px);
+  }
+}
+
+@keyframes bounceMobile {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateX(-50%) translateY(0);
+  }
+  40% {
+    transform: translateX(-50%) translateY(-6px);
+  }
+  60% {
+    transform: translateX(-50%) translateY(-3px);
+  }
 }
 
 /* Theme Toggle */
 .theme-toggle {
   position: fixed;
-  top: var(--spacing-md);
+  top: calc(var(--spacing-md) * 3); /* Gleiche Höhe wie der Header-Name */
   right: var(--spacing-md);
   z-index: 1000;
   background: var(--toggle-bg);
@@ -522,11 +738,24 @@ body {
   background: #000000; /* Vollständig schwarz für Dark Mode */
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
   .theme-toggle {
-    top: var(--spacing-sm);
+    top: calc(var(--spacing-md) * 3); /* Gleiche Höhe wie Header für Tablet */
     right: var(--spacing-sm);
     padding: 0.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .theme-toggle {
+    top: calc(var(--spacing-md) * 2.5); /* Angepasst an Mobile Header-Position */
+    right: var(--spacing-sm);
+    padding: 0.5rem;
+  }
+  
+  .project-title {
+    bottom: calc(var(--spacing-md) * 1.75); /* Angepasst für Mobile */
+    left: var(--spacing-sm);
   }
 }
 
@@ -1161,6 +1390,10 @@ body {
   /* Berechne die Breite basierend auf dem Seitenverhältnis und der Container-Höhe */
   width: calc(66vh * var(--aspect-ratio, 1.78)); /* 66vh ist die media-container Höhe */
   max-width: 90vw; /* Verhindere Überlauf bei sehr breiten Videos */
+  margin: 0 auto; /* Zentriere YouTube-Videos horizontal */
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* Spezifische Orientierungs-Styles */
@@ -1257,46 +1490,62 @@ body {
 
 /* Responsive YouTube Videos */
 @media (max-width: 768px) {
+  .youtube-container {
+    /* Mobile: Responsive Größenanpassung - korrekte Positionierung */
+    width: auto !important; /* Auto-Breite für natürliche Zentrierung */
+    max-width: calc(100vw - 4rem) !important; /* Angepasst für symmetrisches Padding */
+    height: auto; /* Auto-Höhe basierend auf Aspect-Ratio */
+    aspect-ratio: var(--aspect-ratio, 1.78); /* Verwende CSS aspect-ratio */
+    max-height: 50vh; /* Begrenze maximale Höhe */
+    min-width: calc(50vw); /* Mindestbreite für gute Sichtbarkeit */
+  }
+  
   .youtube-container.landscape {
-    width: calc(66vh * var(--aspect-ratio, 1.78));
-    max-width: 85vw;
+    aspect-ratio: var(--aspect-ratio, 1.78);
   }
   
   .youtube-container.portrait {
-    width: calc(66vh * var(--aspect-ratio, 0.56));
-    max-width: 50vw;
+    aspect-ratio: var(--aspect-ratio, 0.56);
+    max-height: 60vh; /* Mehr Höhe für Portrait */
   }
   
   .youtube-container.square {
-    width: 66vh;
-    max-width: 70vw;
+    aspect-ratio: 1;
   }
   
   .youtube-play-button svg {
     width: 48px;
     height: 36px;
   }
-  
-  .youtube-link {
-    font-size: 12px;
-    padding: 6px 12px;
-  }
 }
 
 @media (max-width: 480px) {
+  .youtube-container {
+    /* Sehr kleine Mobile: Angepasste Größen */
+    max-width: calc(100vw - 3rem) !important; /* Angepasst für kleineres Padding */
+    height: auto;
+    aspect-ratio: var(--aspect-ratio, 1.78);
+    max-height: 45vh;
+    min-width: calc(60vw); /* Größere Mindestbreite */
+  }
+  
   .youtube-container.landscape {
-    width: calc(66vh * var(--aspect-ratio, 1.78));
-    max-width: 90vw;
+    width: calc(100vw - 2rem) !important;
+    max-width: calc(100vw - 2rem) !important;
+    aspect-ratio: var(--aspect-ratio, 1.78);
   }
   
   .youtube-container.portrait {
-    width: calc(66vh * var(--aspect-ratio, 0.56));
-    max-width: 60vw;
+    width: calc(100vw - 2rem) !important;
+    max-width: calc(100vw - 2rem) !important;
+    aspect-ratio: var(--aspect-ratio, 0.56);
+    max-height: 55vh;
   }
   
   .youtube-container.square {
-    width: 66vh;
-    max-width: 80vw;
+    width: calc(100vw - 2rem) !important;
+    max-width: calc(100vw - 2rem) !important;
+    aspect-ratio: 1;
   }
   
   .youtube-play-button svg {
@@ -1471,5 +1720,55 @@ body {
   
   .impressum-section {
     margin-bottom: 1.5rem;
+  }
+}
+
+/* Mobile Navigation Hints */
+@media (max-width: 768px) {
+  .media-container::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 20px;
+    height: 60px;
+    background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.1));
+    pointer-events: none;
+    z-index: 5;
+  }
+  
+  /* Scroll-Indikator wenn mehr Inhalte vorhanden */
+  .media-container[data-scrollable="true"]::after {
+    opacity: 1;
+  }
+  
+  .media-container[data-scrollable="false"]::after {
+    opacity: 0;
+  }
+}
+
+/* Bessere Touch-Targets für Video-Controls */
+@media (max-width: 768px) {
+  .video-unmute-btn {
+    /* Größerer Touch-Bereich auf Mobile */
+    width: 44px;
+    height: 44px;
+    bottom: 1rem;
+    right: 1rem;
+    /* Mindest-Touch-Größe nach Apple/Google Guidelines */
+    min-width: 44px;
+    min-height: 44px;
+  }
+}
+
+@media (max-width: 480px) {
+  .video-unmute-btn {
+    width: 40px;
+    height: 40px;
+    bottom: 0.75rem;
+    right: 0.75rem;
+    min-width: 40px;
+    min-height: 40px;
   }
 }

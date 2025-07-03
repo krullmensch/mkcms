@@ -12,6 +12,21 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
 
   return (
     <html lang="de">
+      <head>
+        <link
+          rel="preconnect"
+          href="https://fonts.googleapis.com"
+        />
+        <link
+          rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossOrigin="anonymous"
+        />
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Questrial&display=swap"
+        />
+      </head>
       <body>
         <ThemeProvider>
           <main>{children}</main>
