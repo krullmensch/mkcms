@@ -41,3 +41,17 @@ next-env.d.ts
 .env
 
 /media
+
+# Database files - MongoDB local data
+/data/
+data/db/
+*.wt
+*.lock
+*.bson
+WiredTiger*
+mongod.lock
+sizeStorer.wt
+storage.bson
+journal/
+diagnostic.data/
+metrics*.interim
