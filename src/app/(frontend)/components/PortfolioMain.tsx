@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
-import { Project } from '@/payload-types'
+import { Project, About } from '@/payload-types'
 import PortfolioHeader from './PortfolioHeader'
 import NameIntro from './NameIntro'
 import ProjectSection from './ProjectSection'
@@ -10,9 +10,10 @@ import InfoButton from './InfoButton'
 
 interface PortfolioMainProps {
   projects: Project[]
+  aboutData?: About | null
 }
 
-const PortfolioMain: React.FC<PortfolioMainProps> = ({ projects }) => {
+const PortfolioMain: React.FC<PortfolioMainProps> = ({ projects, aboutData = null }) => {
   const [showIntro, setShowIntro] = useState(false)
 
   // Titel-Animation ist deaktiviert - showIntro bleibt immer false
@@ -34,7 +35,7 @@ const PortfolioMain: React.FC<PortfolioMainProps> = ({ projects }) => {
     <div className="portfolio-container">
       {showIntro && <NameIntro onAnimationComplete={handleAnimationComplete} />}
 
-      <PortfolioHeader isVisible={!showIntro} />
+      <PortfolioHeader isVisible={!showIntro} aboutData={aboutData} />
 
       {/* Search Button und Info Button - nur anzeigen wenn Intro vorbei ist */}
       {!showIntro && (

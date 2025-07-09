@@ -15,5 +15,18 @@ export default async function HomePage() {
     depth: 2, // Um Media-Referenzen aufzulösen
   })
 
-  return <PortfolioMain projects={projects} />
+  // About-Daten für "Marvin Krullmann" abrufen
+  const { docs: abouts } = await payload.find({
+    collection: 'about',
+    where: {
+      name: {
+        equals: 'Marvin Krullmann',
+      },
+    },
+    depth: 1,
+  })
+
+  const aboutData = abouts.length > 0 ? abouts[0] : null
+
+  return <PortfolioMain projects={projects} aboutData={aboutData} />
 }

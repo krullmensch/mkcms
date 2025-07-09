@@ -182,19 +182,19 @@ const InfoButton: React.FC = () => {
               <div className="impressum-section">
                 <h3>Verwendete Schriftarten und Lizenzen</h3>
                 <p>
-                  Diese Website verwendet die Schriftart "Questrial" von{' '}
-                  <a 
-                    href="https://fonts.google.com/specimen/Questrial" 
-                    target="_blank" 
+                  Diese Website verwendet die Schriftart &quot;Questrial&quot; von{' '}
+                  <a
+                    href="https://fonts.google.com/specimen/Questrial"
+                    target="_blank"
                     rel="noopener noreferrer"
                     style={{ color: 'inherit', textDecoration: 'underline' }}
                   >
                     Google Fonts
                   </a>
                   , entwickelt von Joe Prince. Die Schriftart ist lizenziert unter der{' '}
-                  <a 
-                    href="https://scripts.sil.org/OFL" 
-                    target="_blank" 
+                  <a
+                    href="https://scripts.sil.org/OFL"
+                    target="_blank"
                     rel="noopener noreferrer"
                     style={{ color: 'inherit', textDecoration: 'underline' }}
                   >
@@ -203,11 +203,11 @@ const InfoButton: React.FC = () => {
                   .
                 </p>
                 <p>
-                  Die Schriftart wird über Google Fonts CDN bereitgestellt. Beim Laden werden 
-                  Daten an Google übertragen. Weitere Informationen in den{' '}
-                  <a 
-                    href="https://developers.google.com/fonts/faq#what_does_using_the_google_fonts_api_mean_for_the_privacy_of_my_users" 
-                    target="_blank" 
+                  Die Schriftart wird über Google Fonts CDN bereitgestellt. Beim Laden werden Daten
+                  an Google übertragen. Weitere Informationen in den{' '}
+                  <a
+                    href="https://developers.google.com/fonts/faq#what_does_using_the_google_fonts_api_mean_for_the_privacy_of_my_users"
+                    target="_blank"
                     rel="noopener noreferrer"
                     style={{ color: 'inherit', textDecoration: 'underline' }}
                   >

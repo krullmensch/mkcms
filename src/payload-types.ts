@@ -255,6 +255,10 @@ export interface Project {
          */
         videoThumbnail?: (string | null) | Media;
         /**
+         * Wählen Sie aus, welche Steuerungselemente für das Video angezeigt werden sollen.
+         */
+        videoControls?: ('none' | 'unmute' | 'full') | null;
+        /**
          * Geben Sie die vollständige YouTube-URL ein (z.B. https://www.youtube.com/watch?v=dQw4w9WgXcQ)
          */
         youtubeUrl?: string | null;
@@ -274,22 +278,6 @@ export interface Project {
          * Automatisch generierte Thumbnail URL (nur lesbar)
          */
         youtubeThumbnailUrl?: string | null;
-        /**
-         * Automatisch berechnetes Seitenverhältnis (Breite/Höhe)
-         */
-        youtubeAspectRatio?: number | null;
-        /**
-         * Automatisch erkannte Video-Orientierung
-         */
-        youtubeOrientation?: ('landscape' | 'portrait' | 'square') | null;
-        /**
-         * Originalbreite des Videos in Pixel
-         */
-        youtubeWidth?: number | null;
-        /**
-         * Originalhöhe des Videos in Pixel
-         */
-        youtubeHeight?: number | null;
         /**
          * Aktivieren Sie diese Option, um ein Standardbild zu verwenden, bis Sie ein eigenes Bild hochladen.
          */
@@ -322,7 +310,7 @@ export interface Project {
   /**
    * Wählen Sie einen oder mehrere Tags zur Kategorisierung des Projekts
    */
-  tags?: ('photo' | 'video' | 'youtube' | '3d' | 'interactive' | 'rendering' | 'live' | 'projection')[] | null;
+  tags?: ('photo' | 'video' | 'youtube' | '3d' | 'interactive' | 'live' | 'projection')[] | null;
   /**
    * Datum der Projekterstellung (für chronologische Sortierung)
    */
@@ -548,15 +536,12 @@ export interface ProjectsSelect<T extends boolean = true> {
         image?: T;
         video?: T;
         videoThumbnail?: T;
+        videoControls?: T;
         youtubeUrl?: T;
         youtubeTitle?: T;
         youtubeVideoId?: T;
         youtubeEmbedUrl?: T;
         youtubeThumbnailUrl?: T;
-        youtubeAspectRatio?: T;
-        youtubeOrientation?: T;
-        youtubeWidth?: T;
-        youtubeHeight?: T;
         useDefaultImage?: T;
         id?: T;
       };

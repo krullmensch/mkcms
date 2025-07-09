@@ -48,27 +48,9 @@ async function fetchYouTubeVideoInfo(videoId: string): Promise<any> {
 
     const data = await response.json()
 
-    // Aspect Ratio und Orientierung berechnen
-    const width = data.width || 1920
-    const height = data.height || 1080
-    const aspectRatio = width / height
-
-    let orientation: 'landscape' | 'portrait' | 'square'
-    if (aspectRatio > 1.1) {
-      orientation = 'landscape'
-    } else if (aspectRatio < 0.9) {
-      orientation = 'portrait'
-    } else {
-      orientation = 'square'
-    }
-
     return {
       title: data.title || 'YouTube Video',
       thumbnailUrl: data.thumbnail_url,
-      aspectRatio,
-      orientation,
-      width,
-      height,
     }
   } catch (error) {
     console.error('Error fetching YouTube video info:', error)
@@ -134,10 +116,6 @@ export default buildConfig({
                         if (!item.youtubeTitle) {
                           item.youtubeTitle = videoInfo.title
                         }
-                        item.youtubeAspectRatio = videoInfo.aspectRatio
-                        item.youtubeOrientation = videoInfo.orientation
-                        item.youtubeWidth = videoInfo.width
-                        item.youtubeHeight = videoInfo.height
                         // Verwende das hochauflösende Thumbnail von der API falls verfügbar
                         if (videoInfo.thumbnailUrl) {
                           item.youtubeThumbnailUrl = videoInfo.thumbnailUrl
@@ -145,12 +123,13 @@ export default buildConfig({
                       }
                     } catch (error) {
                       console.warn('Could not fetch YouTube video info:', error)
-                      // Fallback-Werte setzen
-                      item.youtubeAspectRatio = 16 / 9 // Standard 16:9
-                      item.youtubeOrientation = 'landscape'
-                      item.youtubeWidth = 1920
-                      item.youtubeHeight = 1080
                     }
+
+                    // Setze Standard-Werte für YouTube Videos (immer Querformat)
+                    item.youtubeAspectRatio = 16 / 9
+                    item.youtubeOrientation = 'landscape'
+                    item.youtubeWidth = 1920
+                    item.youtubeHeight = 1080
                   }
                 }
                 processedImages.push(item)
@@ -253,6 +232,35 @@ export default buildConfig({
               },
             },
             {
+              name: 'videoControls',
+              type: 'radio',
+              label: 'Video-Steuerung',
+              required: false,
+              defaultValue: 'unmute',
+              options: [
+                {
+                  label: 'Keine Steuerung',
+                  value: 'none',
+                },
+                {
+                  label: 'Nur Unmute-Button',
+                  value: 'unmute',
+                },
+                {
+                  label: 'Vollständige Controls (Play, Pause, Fortschritt, etc.)',
+                  value: 'full',
+                },
+              ],
+              admin: {
+                description:
+                  'Wählen Sie aus, welche Steuerungselemente für das Video angezeigt werden sollen.',
+                condition: (data, siblingData) => {
+                  return siblingData?.mediaType === 'video'
+                },
+                layout: 'vertical',
+              },
+            },
+            {
               name: 'youtubeUrl',
               type: 'text',
               label: 'YouTube URL',
@@ -325,59 +333,6 @@ export default buildConfig({
               },
             },
             {
-              name: 'youtubeAspectRatio',
-              type: 'number',
-              label: 'Video Seitenverhältnis',
-              admin: {
-                readOnly: true,
-                description: 'Automatisch berechnetes Seitenverhältnis (Breite/Höhe)',
-                condition: (data, siblingData) => {
-                  return siblingData?.mediaType === 'youtube'
-                },
-              },
-            },
-            {
-              name: 'youtubeOrientation',
-              type: 'select',
-              label: 'Video Orientierung',
-              options: [
-                { label: 'Querformat', value: 'landscape' },
-                { label: 'Hochformat', value: 'portrait' },
-                { label: 'Quadratisch', value: 'square' },
-              ],
-              admin: {
-                readOnly: true,
-                description: 'Automatisch erkannte Video-Orientierung',
-                condition: (data, siblingData) => {
-                  return siblingData?.mediaType === 'youtube'
-                },
-              },
-            },
-            {
-              name: 'youtubeWidth',
-              type: 'number',
-              label: 'Video Breite (px)',
-              admin: {
-                readOnly: true,
-                description: 'Originalbreite des Videos in Pixel',
-                condition: (data, siblingData) => {
-                  return siblingData?.mediaType === 'youtube'
-                },
-              },
-            },
-            {
-              name: 'youtubeHeight',
-              type: 'number',
-              label: 'Video Höhe (px)',
-              admin: {
-                readOnly: true,
-                description: 'Originalhöhe des Videos in Pixel',
-                condition: (data, siblingData) => {
-                  return siblingData?.mediaType === 'youtube'
-                },
-              },
-            },
-            {
               name: 'useDefaultImage',
               type: 'checkbox',
               label: 'Standardbild verwenden',
@@ -436,10 +391,6 @@ export default buildConfig({
             {
               label: 'Interactive',
               value: 'interactive',
-            },
-            {
-              label: 'Rendering',
-              value: 'rendering',
             },
             {
               label: 'Live',

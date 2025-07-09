@@ -8,15 +8,13 @@ interface SearchButtonProps {
 }
 
 // Alle verfügbaren Tags aus dem Backend
-const AVAILABLE_TAGS = [
-  'photo',
-  'video',
-  '3d',
-  'interactive',
-  'rendering',
-  'live',
-  'projection',
-] as const
+const AVAILABLE_TAGS = ['photo', 'video', '3d', 'interactive', 'live', 'projection'] as const
+
+// Funktion zum korrekten Anzeigen von Tags
+const formatTagDisplay = (tag: string): string => {
+  if (tag === '3d') return '3D'
+  return tag.charAt(0).toUpperCase() + tag.slice(1)
+}
 
 type TagType = (typeof AVAILABLE_TAGS)[number]
 
@@ -108,7 +106,7 @@ const SearchButton: React.FC<SearchButtonProps> = ({ projects }) => {
       return DEFAULT_IMAGE
     }
 
-    // Suche nach einem Media-Item (entweder Bild oder Video)
+    // Suche nach einem Media-Item (entweder Bild, Video oder YouTube)
     const mediaItem = project.projectImages.find(
       (item) =>
         (item.image &&
@@ -118,11 +116,17 @@ const SearchButton: React.FC<SearchButtonProps> = ({ projects }) => {
         (item.video &&
           typeof item.video === 'object' &&
           item.video !== null &&
-          'url' in item.video),
+          'url' in item.video) ||
+        (item.mediaType === 'youtube' && item.youtubeThumbnailUrl),
     )
 
     if (!mediaItem) {
       return DEFAULT_IMAGE
+    }
+
+    // Wenn es ein YouTube-Video ist, verwende das YouTube-Thumbnail
+    if (mediaItem.mediaType === 'youtube' && mediaItem.youtubeThumbnailUrl) {
+      return mediaItem.youtubeThumbnailUrl
     }
 
     // Wenn es ein Video ist, prüfe auf videoThumbnail
@@ -221,21 +225,7 @@ const SearchButton: React.FC<SearchButtonProps> = ({ projects }) => {
           onKeyDown={handleKeyDown}
         >
           <div className="search-container">
-            <div className="search-input-wrapper">
-              <svg
-                className="search-icon"
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <circle cx="11" cy="11" r="8" />
-                <path d="m21 21-4.35-4.35" />
-              </svg>
+            <div className="search-header">
               <input
                 ref={searchInputRef}
                 type="text"
@@ -267,24 +257,21 @@ const SearchButton: React.FC<SearchButtonProps> = ({ projects }) => {
             </div>
 
             {/* Tag-Filter */}
-            <div className="search-tags-section">
-              <div className="search-tags-header">Filter nach Tags:</div>
-              <div className="search-tags-container">
-                {AVAILABLE_TAGS.map((tag) => (
-                  <button
-                    key={tag}
-                    onClick={() => handleTagToggle(tag)}
-                    className={`search-tag-filter ${selectedTags.includes(tag) ? 'active' : ''}`}
-                  >
-                    {tag}
-                  </button>
-                ))}
-                {selectedTags.length > 0 && (
-                  <button onClick={() => setSelectedTags([])} className="search-tags-clear">
-                    Alle entfernen
-                  </button>
-                )}
-              </div>
+            <div className="search-tags">
+              {AVAILABLE_TAGS.map((tag) => (
+                <button
+                  key={tag}
+                  onClick={() => handleTagToggle(tag)}
+                  className={`search-tag ${selectedTags.includes(tag) ? 'active' : ''}`}
+                >
+                  {formatTagDisplay(tag)}
+                </button>
+              ))}
+              {selectedTags.length > 0 && (
+                <button onClick={() => setSelectedTags([])} className="search-tags-clear">
+                  Alle entfernen
+                </button>
+              )}
             </div>
 
             {/* Suchergebnisse */}
@@ -307,7 +294,7 @@ const SearchButton: React.FC<SearchButtonProps> = ({ projects }) => {
                         <button
                           key={project.id}
                           onClick={() => handleProjectClick(project.id)}
-                          className="search-result-card"
+                          className="search-result-item"
                         >
                           <div className="search-result-thumbnail">
                             <img
@@ -320,22 +307,19 @@ const SearchButton: React.FC<SearchButtonProps> = ({ projects }) => {
                             />
                           </div>
                           <div className="search-result-content">
-                            <div className="search-result-title">{project.projectName}</div>
-                            {project.creationDate && (
-                              <div className="search-result-year">
-                                {new Date(project.creationDate).getFullYear()}
-                              </div>
-                            )}
-                            {project.shortDescription && (
-                              <div className="search-result-description">
-                                {project.shortDescription}
-                              </div>
-                            )}
+                            <div className="search-result-title-row">
+                              <div className="search-result-title">{project.projectName}</div>
+                              {project.creationDate && (
+                                <div className="search-result-year">
+                                  {new Date(project.creationDate).getFullYear()}
+                                </div>
+                              )}
+                            </div>
                             {project.tags && project.tags.length > 0 && (
                               <div className="search-result-tags">
                                 {project.tags.slice(0, 3).map((tag: string, index: number) => (
                                   <span key={index} className="search-result-tag">
-                                    {tag}
+                                    {formatTagDisplay(tag)}
                                   </span>
                                 ))}
                                 {project.tags.length > 3 && (
